@@ -355,6 +355,8 @@ class CouchDB
 	 * @param string $reduce optional reduce function for the view
 	 * @return CouchDBResponse
 	 * @author Adam Venturella
+	 * @example ../samples/commands/create_view.php Create a view.
+	 * @example ../samples/commands/create_view_reduce.php Create a view with a reduce function.
 	 */
 	public function create_view($designView, $map, $reduce=null)
 	{
