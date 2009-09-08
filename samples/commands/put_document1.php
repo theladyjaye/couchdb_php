@@ -35,8 +35,19 @@
 	$options = array('database'=>$newdb);
 	$db      = new CouchDB($options);
 	
+	// Document as JSON:
 	$json     = couchdb_json_encode(array('data'=>'hello world'));
 	$result   = $db->put($json);
+	
+	// OR As an Object
+	$document = new stdClass();
+	$document->data = 'Hello World!';
+	$db->put($document);
+	
+	// OR As an Array:
+	$document = array();
+	$document['data'] = 'Hello World!!';
+	$db->put($document);
 	
 	// the newly created document id
 	echo $result['id'];

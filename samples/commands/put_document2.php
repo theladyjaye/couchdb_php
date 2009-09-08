@@ -43,9 +43,13 @@
 	
 	// Add a new value
 	$document['screenname'] = 'lipsum';
-	$json                   = couchdb_json_encode($document);
 	
+	// As JSON
+	$json                   = couchdb_json_encode($document);
 	$db->put($json, $document_id);
+	
+	// OR As Array:
+	//$db->put($document, $document_id);
 	
 	// Get the document again to show it changed
 	echo '<h2>AFTER</h2>';
