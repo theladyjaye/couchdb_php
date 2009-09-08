@@ -1,0 +1,626 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+		<head>
+			<!-- template designed by Marco Von Ballmoos -->
+			<title>Docs For Class CouchDB</title>
+			<link rel="stylesheet" href="../media/stylesheet.css" />
+			<meta http-equiv='Content-Type' content='text/html; charset=iso-8859-1'/>
+		</head>
+		<body>
+			<div class="page-body">			
+<h2 class="class-name"><img src="../media/images/Class_logo.png"
+														alt=" Class"
+														title=" Class"
+														style="vertical-align: middle"> CouchDB</h2>
+
+<a name="sec-description"></a>
+<div class="info-box">
+	<div class="info-box-title">Description</div>
+	<div class="nav-bar">
+					<span class="disabled">Description</span> |
+															<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+						
+					</div>
+	<div class="info-box-body">
+        		<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Principal CouchDB Class.</p>
+<p class="description"><p>A Wrapper for all CouchDB Commands</p></p>
+		<p class="notes">
+			Located in <a class="field" href="_CouchDB.php.html">/CouchDB.php</a> (line <span class="field">56</span>)
+		</p>
+		
+				
+		<pre></pre>
+	
+			</div>
+</div>
+
+
+
+
+	<a name="sec-method-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Method Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+												<span class="disabled">Methods</span> (<a href="#sec-methods">details</a>)
+		</div>
+		<div class="info-box-body">			
+			<div class="method-summary">
+																																																																																																																								<div class="method-definition">
+					<img src="../media/images/Constructor.png" alt=" "/>
+											<span class="method-result">CouchDB</span>
+										<a href="#__construct" title="details" class="method-name">__construct</a>
+											([<span class="var-type">array</span>&nbsp;<span class="var-name">$options</span> = <span class="var-default">null</span>])
+									</div>
+																<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">mixed</span>
+										<a href="#attachment" title="details" class="method-name">attachment</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$document</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$name</span>)
+									</div>
+																<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#create_database" title="details" class="method-name">create_database</a>
+											([<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span> = <span class="var-default">null</span>])
+									</div>
+																<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../Net/CouchDBResponse.html">CouchDBResponse</a></span>
+										<a href="#delete" title="details" class="method-name">delete</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$id</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$revision</span> = <span class="var-default">null</span>])
+									</div>
+																<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../Net/CouchDBResponse.html">CouchDBResponse</a></span>
+										<a href="#delete_attachment" title="details" class="method-name">delete_attachment</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$document</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$name</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$revision</span> = <span class="var-default">null</span>])
+									</div>
+																<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#delete_database" title="details" class="method-name">delete_database</a>
+											([<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span> = <span class="var-default">null</span>])
+									</div>
+																<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#document" title="details" class="method-name">document</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$id</span>, [<span class="var-type">bool</span>&nbsp;<span class="var-name">$json</span> = <span class="var-default">false</span>])
+									</div>
+																<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">string|array</span>
+										<a href="#info" title="details" class="method-name">info</a>
+											([<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span> = <span class="var-default">null</span>], [<span class="var-type">bool</span>&nbsp;<span class="var-name">$json</span> = <span class="var-default">false</span>])
+									</div>
+																<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../Net/CouchDBResponse.html">CouchDBResponse</a></span>
+										<a href="#put" title="details" class="method-name">put</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$json</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$id</span> = <span class="var-default">null</span>], [<span class="var-type">bool</span>&nbsp;<span class="var-name">$batch</span> = <span class="var-default">false</span>])
+									</div>
+																<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../Net/CouchDBResponse.html">CouchDBResponse</a></span>
+										<a href="#put_attachment" title="details" class="method-name">put_attachment</a>
+											(<span class="var-type">array</span>&nbsp;<span class="var-name">$attachment</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$document</span> = <span class="var-default">null</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$revision</span> = <span class="var-default">null</span>])
+									</div>
+																<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">string|<a href="../Core/CouchDBView.html">CouchDBView</a></span>
+										<a href="#temp_view" title="details" class="method-name">temp_view</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$map</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$reduce</span> = <span class="var-default">null</span>], [<span class="var-type">array</span>&nbsp;<span class="var-name">$options</span> = <span class="var-default">null</span>], [<span class="var-type">bool</span>&nbsp;<span class="var-name">$json</span> = <span class="var-default">false</span>])
+									</div>
+																<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">string|<a href="../Core/CouchDBView.html">CouchDBView</a></span>
+										<a href="#view" title="details" class="method-name">view</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$target</span>, [<span class="var-type">array</span>&nbsp;<span class="var-name">$options</span> = <span class="var-default">null</span>], [<span class="var-type">bool</span>&nbsp;<span class="var-name">$json</span> = <span class="var-default">false</span>])
+									</div>
+																<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">string</span>
+										<a href="#__get" title="details" class="method-name">__get</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span>)
+									</div>
+											</div>
+		</div>
+	</div>		
+
+	
+	<a name="sec-methods"></a>
+	<div class="info-box">
+		<div class="info-box-title">Methods</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+													<a href="#sec-method-summary">Methods</a> (<span class="disabled">details</span>)
+						
+		</div>
+		<div class="info-box-body">
+			<A NAME='method_detail'></A>
+<a name="method__construct" id="__construct"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Constructor.png" />
+		<span class="method-title">Constructor __construct</span> (line <span class="line-number">77</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">CouchDB Constructor</p>
+<p class="description"><p>Available option keys:  'database'  'host'  'port'  'timeout'  'transport'  All have default values with the exception of 'database'</p></p>
+	<ul class="tags">
+				<li><span class="field">author:</span> Adam Venturella</li>
+				<li><span class="field">see:</span> <a href="../Net/CouchDBConnection.html#method__construct">CouchDBConnection::__construct()</a></li>
+				<li><span class="field">access:</span> public</li>
+				<li><span class="field">example:</span> <a href="../__examplesource/exsource_uchApp_couchdb_php_trunk_samples_setup_connect.php_cdf8efe0688f3ab492f8283aea72cb28.html">Sample instantiation.</a></li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">CouchDB</span>
+		<span class="method-name">
+			__construct
+		</span>
+					([<span class="var-type">array</span>&nbsp;<span class="var-name">$options</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">array</span>
+				<span class="var-name">$options</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodattachment" id="attachment"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">attachment</span> (line <span class="line-number">187</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get an attachment of a given document with the given name  it will return the body of the attachment, without any HTTP headers  if that body represents an image, it will return the raw image data</p>
+	<ul class="tags">
+				<li><span class="field">author:</span> Adam Venturella</li>
+				<li><span class="field">access:</span> public</li>
+				<li><span class="field">example:</span> <a href="../__examplesource/exsource_chdb_php_trunk_samples_commands_get_attachment.php_96e3a4c8b72ecaff0eaa2aa09ce0a83e.html">Get an attachment from an existing document</a></li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">mixed</span>
+		<span class="method-name">
+			attachment
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$document</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$name</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$document</span><span class="var-description">: the id of the document</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$name</span><span class="var-description">: the name of the attachment</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodcreate_database" id="create_database"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">create_database</span> (line <span class="line-number">390</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Create a new database</p>
+	<ul class="tags">
+				<li><span class="field">author:</span> Adam Venturella</li>
+				<li><span class="field">access:</span> public</li>
+				<li><span class="field">example:</span> <a href="../__examplesource/exsource_db_php_trunk_samples_databases_create_database.php_c59eaf47a45aee8fc62a8fb618ab94a4.html">Create a database</a></li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			create_database
+		</span>
+					([<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$value</span><span class="var-description">: optional the name of the database to create.                if no value is given, the database specified in the                connection options for CouchDB::__construct() will                attempt to be created</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methoddelete" id="delete"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">delete</span> (line <span class="line-number">125</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Delete a document in the database</p>
+<p class="description"><p>Delete a document with a given id and revision.  if no revision is given, a request will be made to get  the latest revision for the provided document id</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+				<li><span class="field">example:</span> <a href="../__examplesource/exsource_hdb_php_trunk_samples_commands_delete_document.php_64184303c5cc6a561c5fc266777dae95.html">Delete an existing document from the database</a></li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../Net/CouchDBResponse.html">CouchDBResponse</a></span>
+		<span class="method-name">
+			delete
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$id</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$revision</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$id</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$revision</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methoddelete_attachment" id="delete_attachment"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">delete_attachment</span> (line <span class="line-number">214</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Delete an attachment</p>
+	<ul class="tags">
+				<li><span class="field">author:</span> Adam Venturella</li>
+				<li><span class="field">access:</span> public</li>
+				<li><span class="field">example:</span> <a href="../__examplesource/exsource_b_php_trunk_samples_commands_delete_attachment.php_eea430bfbcf12e4ae7c01c7c3bfd7dd5.html">Delete an attachment from an existing document</a></li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../Net/CouchDBResponse.html">CouchDBResponse</a></span>
+		<span class="method-name">
+			delete_attachment
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$document</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$name</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$revision</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$document</span><span class="var-description">: the id of the document</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$name</span><span class="var-description">: the name of the attachment</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$revision</span><span class="var-description">: optional the revision of the document.                if no revision is provided, a lookup will be performed                with the given document id to reteive the latest revision id</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methoddelete_database" id="delete_database"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">delete_database</span> (line <span class="line-number">419</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Delete a database</p>
+	<ul class="tags">
+				<li><span class="field">author:</span> Adam Venturella</li>
+				<li><span class="field">access:</span> public</li>
+				<li><span class="field">example:</span> <a href="../__examplesource/exsource_db_php_trunk_samples_databases_delete_database.php_861ec48824da5b4f75cfc4597025b9a9.html">Delete a database</a></li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			delete_database
+		</span>
+					([<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$value</span><span class="var-description">: optional the name of the database to delete.                if no value is given, the database specified in the                connection options for CouchDB::__construct() will                attempt to be deleted</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methoddocument" id="document"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">document</span> (line <span class="line-number">91</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get a document with a given id from the database.</p>
+	<ul class="tags">
+				<li><span class="field">author:</span> Adam Venturella</li>
+				<li><span class="field">access:</span> public</li>
+				<li><span class="field">example:</span> <a href="../__examplesource/exsource_ouchdb_php_trunk_samples_commands_get_document.php_f47cf5f3c42c1de48a79775537c9787e.html">Get an existing document from the database</a></li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			document
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$id</span>, [<span class="var-type">bool</span>&nbsp;<span class="var-name">$json</span> = <span class="var-default">false</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$id</span><span class="var-description">: the id of the document you wish to retrieve</span>			</li>
+					<li>
+				<span class="var-type">bool</span>
+				<span class="var-name">$json</span><span class="var-description">: default is false, weather or not to return the result as JSON</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodinfo" id="info"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">info</span> (line <span class="line-number">451</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get information for a given database</p>
+	<ul class="tags">
+				<li><span class="field">author:</span> Adam Venturella</li>
+				<li><span class="field">access:</span> public</li>
+				<li><span class="field">example:</span> <a href="../__examplesource/exsource_hApp_couchdb_php_trunk_samples_databases_info3.php_269ab069fb93ebaee75498a6c8728c47.html">Get info as JSON specifying desired database</a></li>
+				<li><span class="field">example:</span> <a href="../__examplesource/exsource_hApp_couchdb_php_trunk_samples_databases_info2.php_c78e293c60f87f63e99c269a48140c7b.html">Get info as array specifying desired database</a></li>
+				<li><span class="field">example:</span> <a href="../__examplesource/exsource_hApp_couchdb_php_trunk_samples_databases_info1.php_6ff4f569f9f3f434d4f7031fed268922.html">Get info as array using connection options database</a></li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string|array</span>
+		<span class="method-name">
+			info
+		</span>
+					([<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span> = <span class="var-default">null</span>], [<span class="var-type">bool</span>&nbsp;<span class="var-name">$json</span> = <span class="var-default">false</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$value</span><span class="var-description">: optional the name of the database to retrive the info for.                if no value is given, the database specified in the                connection options for CouchDB::__construct() will                be used</span>			</li>
+					<li>
+				<span class="var-type">bool</span>
+				<span class="var-name">$json</span><span class="var-description">: default is false, weather or not to return the result as JSON</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodput" id="put"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">put</span> (line <span class="line-number">162</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Put a new document into the database</p>
+	<ul class="tags">
+				<li><span class="field">author:</span> Adam Venturella</li>
+				<li><span class="field">access:</span> public</li>
+				<li><span class="field">example:</span> <a href="../__examplesource/exsource_uchdb_php_trunk_samples_commands_put_document1.php_03798ac061b455bfc159adc2e8bd8b43.html">Create a new document in the database</a></li>
+				<li><span class="field">example:</span> <a href="../__examplesource/exsource_uchdb_php_trunk_samples_commands_put_document2.php_80cc86f7bb60f11e51dd1ca82beae2df.html">Update an existing document</a></li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../Net/CouchDBResponse.html">CouchDBResponse</a></span>
+		<span class="method-name">
+			put
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$json</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$id</span> = <span class="var-default">null</span>], [<span class="var-type">bool</span>&nbsp;<span class="var-name">$batch</span> = <span class="var-default">false</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$json</span><span class="var-description">: The valid JSON describing the document you wish you add to the database</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$id</span><span class="var-description">: optional id for the document. If no id is specififed a new id will be generated and a new document created</span>			</li>
+					<li>
+				<span class="var-type">bool</span>
+				<span class="var-name">$batch</span><span class="var-description">: <p>put is part of a batch operation.  See: <a href="http://wiki.apache.org/couchdb/HTTP_Document_API">CouchDB Document API for PUT</a>. Can be used to achieve higher throughput at the cost of lower guarantees.                      When a PUT (or a document POST as described below) is sent using this option, it is not immediately written to disk.                      Instead it is stored in memory on a per-user basis for a second or so (or the number of docs in memory reaches a certain point).                      After the threshold has passed, the docs are committed to disk. Instead of waiting for the doc to be written to disk before                      responding, CouchDB sends an HTTP 202 Accepted response immediately.</p><p>batch is not suitable for crucial data, but it ideal for applications like logging which can accept the risk that a small                      proportion of updates could be lost due to a crash. Docs in the batch can also be flushed manually using the _ensure_full_commit API.</p></span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodput_attachment" id="put_attachment"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">put_attachment</span> (line <span class="line-number">256</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Add an attachment to a given document  or create a new document with an attachment</p>
+	<ul class="tags">
+				<li><span class="field">author:</span> Adam Venturella</li>
+				<li><span class="field">access:</span> public</li>
+				<li><span class="field">example:</span> <a href="../__examplesource/exsource_hdb_php_trunk_samples_commands_put_attachment1.php_fb50836339af49c89f7d51727f6cb591.html">Create a new document starting with an attachment</a></li>
+				<li><span class="field">example:</span> <a href="../__examplesource/exsource_hdb_php_trunk_samples_commands_put_attachment2.php_d5a9a144785e9f4a6fbb9d4de9c355ae.html">Add an attachment to an existing document</a></li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../Net/CouchDBResponse.html">CouchDBResponse</a></span>
+		<span class="method-name">
+			put_attachment
+		</span>
+					(<span class="var-type">array</span>&nbsp;<span class="var-name">$attachment</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$document</span> = <span class="var-default">null</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$revision</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">array</span>
+				<span class="var-name">$attachment</span><span class="var-description">: an array with the following keys:               'name' required the name of the attachment to add to the database               'path' required the path to the file whose contents will be added               'content-type' optional the content type, eg: image/jpeg, image/png, text/plain                of the attachment. If this is not provided, a best guess will be made.                the system will currently figure out gif, jpeg, and png. if it is not                one of those then binary/octet-stream will be used unless the 'content-type'                key is specified.</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$document</span><span class="var-description">: optional the id of the document.                if no $document is provided, a new document will be                will be created.</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$revision</span><span class="var-description">: optional the revision of the document to add                the attachment too. If no document id is provided, this value                should be null</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodtemp_view" id="temp_view"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">temp_view</span> (line <span class="line-number">309</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get a Temp View</p>
+<p class="description"><p>Temporary views are only good during development. Final code  should not rely on them as they are very expensive to compute  each time they get called and they get increasingly slower the  more data you have in a database.</p><p>See Temporary Views</p></p>
+	<ul class="tags">
+				<li><span class="field">author:</span> Adam Venturella</li>
+				<li><span class="field">link:</span> <a href="http://wiki.apache.org/couchdb/HTTP_view_API">http://wiki.apache.org/couchdb/HTTP_view_API</a></li>
+				<li><span class="field">access:</span> public</li>
+				<li><span class="field">example:</span> <a href="../__examplesource/exsource_p_couchdb_php_trunk_samples_commands_temp_view.php_044f5bbbd02ffea01b715b34123834da.html">Execute a temp view.</a></li>
+				<li><span class="field">example:</span> <a href="../__examplesource/exsource_db_php_trunk_samples_commands_temp_view_reduce.php_c22dcf20e388ec30b29d4f9ca01b4775.html">Execute a temp view with a reduce function.</a></li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string|<a href="../Core/CouchDBView.html">CouchDBView</a></span>
+		<span class="method-name">
+			temp_view
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$map</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$reduce</span> = <span class="var-default">null</span>], [<span class="var-type">array</span>&nbsp;<span class="var-name">$options</span> = <span class="var-default">null</span>], [<span class="var-type">bool</span>&nbsp;<span class="var-name">$json</span> = <span class="var-default">false</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$map</span><span class="var-description">: the map function to execute to generate the view</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$reduce</span><span class="var-description">: optional reduce function for the map</span>			</li>
+					<li>
+				<span class="var-type">array</span>
+				<span class="var-name">$options</span><span class="var-description">: optional array of querying options.               key=aValue               startkey=aValue               startkey_docid=aDocid               endkey=aValue               endkey_docid=aDocid               limit=max rows to return               stale=ok               descending=true               skip=number of rows to skip               group=true               group_level=int               reduce=false               include_docs=true               Values must valid JSON for key, startkey, endkey</span>			</li>
+					<li>
+				<span class="var-type">bool</span>
+				<span class="var-name">$json</span><span class="var-description">: default is false, weather or not to return the result as JSON</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodview" id="view"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">view</span> (line <span class="line-number">357</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get a View</p>
+<p class="description"><p>See Querying Options</p></p>
+	<ul class="tags">
+				<li><span class="field">author:</span> Adam Venturella</li>
+				<li><span class="field">link:</span> <a href="http://wiki.apache.org/couchdb/HTTP_view_API">http://wiki.apache.org/couchdb/HTTP_view_API</a></li>
+				<li><span class="field">access:</span> public</li>
+				<li><span class="field">example:</span> <a href="../__examplesource/exsource_uchApp_couchdb_php_trunk_samples_commands_view.php_b560c0ddabeb483faf8e3844117d81f0.html">Execute a view, and a view with query options, print the results.</a></li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string|<a href="../Core/CouchDBView.html">CouchDBView</a></span>
+		<span class="method-name">
+			view
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$target</span>, [<span class="var-type">array</span>&nbsp;<span class="var-name">$options</span> = <span class="var-default">null</span>], [<span class="var-type">bool</span>&nbsp;<span class="var-name">$json</span> = <span class="var-default">false</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$target</span><span class="var-description">: the view you wish to retrieve, eg: 'users/all', 'group/view'</span>			</li>
+					<li>
+				<span class="var-type">array</span>
+				<span class="var-name">$options</span><span class="var-description">: optional array of querying options.               key=aValue               startkey=aValue               startkey_docid=aDocid               endkey=aValue               endkey_docid=aDocid               limit=max rows to return               stale=ok               descending=true               skip=number of rows to skip               group=true               group_level=int               reduce=false               include_docs=true               Values must valid JSON for key, startkey, endkey</span>			</li>
+					<li>
+				<span class="var-type">bool</span>
+				<span class="var-name">$json</span><span class="var-description">: default is false, weather or not to return the result as JSON</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method__get" id="__get"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">__get</span> (line <span class="line-number">555</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Overloaded property handler.</p>
+<p class="description"><p>version is treated like a property not a function.</p></p>
+	<ul class="tags">
+				<li><span class="field">author:</span> Adam Venturella</li>
+				<li><span class="field">access:</span> public</li>
+				<li><span class="field">example:</span> <a href="../__examplesource/exsource_uchApp_couchdb_php_trunk_samples_setup_version.php_d6fe623ac0719abf1132ecbd4f73538a.html">Get the server version.</a></li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			__get
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$value</span><span class="var-description">: the name of property to retrieve</span>			</li>
+				</ul>
+		
+			
+	</div>
+						
+		</div>
+	</div>
+
+	
+	<p class="notes" id="credit">
+		Documentation generated on Mon, 06 Jul 2009 10:44:09 -0700 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.2</a>
+	</p>
+	</div></body>
+</html>
