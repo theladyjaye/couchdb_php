@@ -64,6 +64,7 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	
 	protected $couchdb;
 	public static $id;
+	public static $id_pdf;
 	
 	protected function pathForResource($resource)
 	{
@@ -468,7 +469,7 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 		$result = $this->putAttachment($key, $filename);
 		$this->assertEquals($result['ok'], true);
 		$id = $result['id'];
-		
+		CouchDBTest::$id_pdf = $id;
 		$this->verifyAttachmentForDocument($key, $filename, $id, $content_type);
 	}
 	
@@ -793,6 +794,122 @@ FUNCTION;
 		$couchdb->create_view('records/no_database_selected', $map);
 	}
 	
+	/* COMPACTION */
+	
+	public function testCompaction()
+	{
+		$response = $this->couchdb->compact(CouchDBTest::kDatabaseName);
+		$this->assertEquals('202', $response->headers['status']['code']);
+		$this->assertEquals($response->result['ok'], true);
+	}
+	
+	/**
+	 * @expectedException Exception
+	 */
+	public function testCompactionWithNoDatabaseOption()
+	{
+		$couchdb = new CouchDB();
+		$couchdb->compact();
+	}
+	
+	/* REPLICATION */
+	
+	public function testReplication()
+	{
+		$this->couchdb->create_database(CouchDBTest::kAltDatabaseName);
+		$this->couchdb->replicate(CouchDBTest::kDatabaseName, CouchDBTest::kAltDatabaseName);
+		
+		$info1 = $this->couchdb->info(CouchDBTest::kDatabaseName);
+		$info2 = $this->couchdb->info(CouchDBTest::kAltDatabaseName);
+		
+		$this->assertEquals($info1['doc_count'], $info2['doc_count']);
+	}
+	
+	public function testReplicationViewDefault()
+	{
+		$replicated = new CouchDB( array('database' => CouchDBTest::kAltDatabaseName) );
+		$result = $replicated->view('records/default');
+		$count  = count($result);
+		$this->assertEquals(2, $count);
+		
+		foreach($result as $document)
+		{
+			$this->assertNotNull($document);
+			$this->assertArrayHasKey('_id', $document);
+			$this->assertArrayHasKey('_rev', $document);
+			$this->assertArrayHasKey('label', $document);
+			$this->assertArrayHasKey('type', $document);
+			$this->assertArrayHasKey('creationDate', $document);
+			
+			$this->assertNotNull($document['_id']);
+			$this->assertNotNull($document['_rev']);
+			$this->assertNotNull($document['label']);
+			$this->assertNotNull($document['type']);
+			$this->assertNotNull($document['creationDate']);
+		}
+		
+		$this->assertTrue(isset($result[0]));
+	}
+	
+	public function testReplicationViewUpdate()
+	{
+		$replicated = new CouchDB( array('database' => CouchDBTest::kAltDatabaseName) );
+		$result = $replicated->view('records/update');
+		$records = count($result);
+		$this->assertEquals(1, $records);
+	}
+	
+	public function testReplicationViewDefaultCount()
+	{
+		$replicated = new CouchDB( array('database' => CouchDBTest::kAltDatabaseName) );
+		$result     = $replicated->view('records/default_count');
+		$this->assertEquals(2, $result[0]['value']);
+	}
+	
+	public function testReplicationAttachment1()
+	{
+		$replicated      = new CouchDB( array('database' => CouchDBTest::kAltDatabaseName) );
+		$original_path   = $this->pathForResource(CouchDBTest::kAttachmentFilename1);
+		$attachment      = $replicated->attachment(CouchDBTest::$id, CouchDBTest::kAttachmentName1);
+		$data1           = hash('md5', $attachment);
+		$data2           = hash('md5', file_get_contents($original_path));
+		
+		$this->assertEquals($data1, $data2);
+	}
+	
+	public function testReplicationAttachmentPDF()
+	{
+		$replicated      = new CouchDB( array('database' => CouchDBTest::kAltDatabaseName) );
+		
+		$original_path   = $this->pathForResource(CouchDBTest::kAttachmentFilenamePDF);
+		$attachment      = $replicated->attachment(CouchDBTest::$id_pdf, CouchDBTest::kAttachmentNamePDF);
+		$data1           = hash('md5', $attachment);
+		$data2           = hash('md5', file_get_contents($original_path));
+		
+		$this->assertEquals($data1, $data2);
+	}
+	
+	/**
+	 * @expectedException Exception
+	 */
+	public function testReplicationAttachment2NotReplicated()
+	{
+		$replicated      = new CouchDB( array('database' => CouchDBTest::kAltDatabaseName) );
+		$original_path   = $this->pathForResource(CouchDBTest::kAttachmentFilename2);
+		$attachment      = $replicated->attachment(CouchDBTest::$id, CouchDBTest::kAttachmentName2);
+	}
+	
+	/**
+	 * @expectedException Exception
+	 */
+	public function testReplicationDeleteWithValue()
+	{
+		$this->couchdb->delete_database(CouchDBTest::kAltDatabaseName);
+		$info = $this->couchdb->info(CouchDBTest::kAltDatabaseName);
+	}
+	
+	
+	/* CLEANUP */
 	
 	public function testDocumentDelete()
 	{
@@ -836,6 +953,8 @@ FUNCTION;
 		$info = $this->couchdb->info(CouchDBTest::kDatabaseName);
 		
 	}
+	
+	
 
 }
 ?>

@@ -31,21 +31,15 @@
  */
 	require 'couchdb/CouchDB.php';
 	
-	$newdb   = 'newdb';
-	$options = array('database'=>$newdb);
-	$db      = new CouchDB($options);
 	
-	$query_options = array('key'=>'email@address.com');
+	$source_db   = 'newdb1';
+	$target_db   = 'newdb2';
+	$db          = new CouchDB();
 	
-	$view                 = $db->view('users/all');
-	$viewWithQueryOptions = $db->view('users/all', $query_options);
-
-	// get the first result:
-	echo '<p>',print_r($viewWithQueryOptions[0], true),'</p>';
+	// assumes that both $source_db and $target_db exist
+	// $source_db and $target_db can be local/local, remote/local, remote/remote, local/remote
+	// see http://wiki.apache.org/couchdb/Replication for push vs pull replication.
+	// hint: you want pull
 	
-	// loop over all of the results
-	foreach($view as $row)
-	{
-		echo '<pre>',print_r($row,true),'</pre>';
-	}
+	$db->replicate($source_db, $target_db);
 ?>

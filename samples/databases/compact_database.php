@@ -35,17 +35,11 @@
 	$options = array('database'=>$newdb);
 	$db      = new CouchDB($options);
 	
-	$query_options = array('key'=>'email@address.com');
+	$db->compact($newdb);
 	
-	$view                 = $db->view('users/all');
-	$viewWithQueryOptions = $db->view('users/all', $query_options);
+	// OR if the 'database' key was specified in the options, 
+	// and you wish to create that database, you can call compact
+	// with no arguments.
 
-	// get the first result:
-	echo '<p>',print_r($viewWithQueryOptions[0], true),'</p>';
-	
-	// loop over all of the results
-	foreach($view as $row)
-	{
-		echo '<pre>',print_r($row,true),'</pre>';
-	}
+	//$db->compact();
 ?>

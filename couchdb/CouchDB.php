@@ -44,6 +44,8 @@ require 'commands/GetDocument.php';
 require 'commands/DeleteDocument.php';
 require 'commands/CreateDatabase.php';
 require 'commands/DeleteDatabase.php';
+require 'commands/Replicate.php';
+require 'commands/Compact.php';
 require 'net/CouchDBConnection.php';
 require 'net/CouchDBResponse.php';
 
@@ -544,6 +546,55 @@ class CouchDB
 		{
 			return $response->result;
 		}
+	}
+	
+	/**
+	 * Compact a database by removing outdated document revisions and deleted documents.
+	 *
+	 * @param string $database optional database name to compact.  If no database name is specified will attempt to use
+	 *               the database specified in the connection options.
+	 * @return CouchDBResponse
+	 * @author Adam Venturella
+	 */
+	
+	public function compact($database=null)
+	{
+		if(!$database)
+		{
+			$database = $this->connectionOptions['database'];
+		}
+		
+		if($database == null){
+			$this->throw_no_database_exception();
+		}
+		
+		$connection = new CouchDBConnection($this->connectionOptions);
+		$response   = $connection->execute(new Compact($database));
+		return $response;
+	}
+	
+	/**
+	 * Replicates all active documents on the source database to the destination database.  
+	 * Additionally, all documents that were deleted in the source databases are also 
+	 * deleted (if exists) on the destination database.
+	 * 
+	 * The replication process only copies the last revision of a document, so all 
+	 * previous revisions that were only on the source database are not copied to 
+	 * the destination database.
+	 *
+	 * See replication API Documentation for more info.
+	 * @link http://wiki.apache.org/couchdb/Replication
+	 *
+	 * @param string $source the source database, remote or local
+	 * @param string $target the target database, remote or local
+	 * @return CouchDBResponse
+	 * @author Adam Venturella
+	 */
+	public function replicate($source, $target)
+	{
+		$connection = new CouchDBConnection($this->connectionOptions);
+		$response   = $connection->execute(new Replicate($source, $target));
+	    return $response;
 	}
 	
 	/**

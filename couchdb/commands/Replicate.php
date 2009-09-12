@@ -19,7 +19,7 @@
  *
  *    Author: Adam Venturella - aventurella@gmail.com
  *
- *    @package Sample 
+ *    @package CouchDB_PHP
  *    @author Adam Venturella <aventurella@gmail.com>
  *    @copyright Copyright (C) 2009 Adam Venturella
  *    @license http://www.apache.org/licenses/LICENSE-2.0 Apache 2.0
@@ -27,25 +27,54 @@
  **/
 
 /**
- * Sample
+ * Includes
  */
-	require 'couchdb/CouchDB.php';
-	
-	$newdb   = 'newdb';
-	$options = array('database'=>$newdb);
-	$db      = new CouchDB($options);
-	
-	$query_options = array('key'=>'email@address.com');
-	
-	$view                 = $db->view('users/all');
-	$viewWithQueryOptions = $db->view('users/all', $query_options);
+require_once 'CouchDBCommand.php';
 
-	// get the first result:
-	echo '<p>',print_r($viewWithQueryOptions[0], true),'</p>';
+/**
+ * Database Replicate Command
+ *
+ * @package Commands
+ * @author Adam Venturella
+ */
+class Replicate implements CouchDBCommand 
+{
+	private $source;
+	private $target;
 	
-	// loop over all of the results
-	foreach($view as $row)
+	/**
+	 * undocumented function
+	 *
+	 * @param string $database 
+	 * @author Adam Venturella
+	 */
+	public function __construct($source, $target)
 	{
-		echo '<pre>',print_r($row,true),'</pre>';
+		$this->source = $source;
+		$this->target = $target;
 	}
+	
+	public function request()
+	{
+		$object         = new stdClass();
+		$object->source = $this->source;
+		$object->target = $this->target;
+		$json           = couchdb_json_encode($object);
+		$content_length = strlen($json);
+		
+		return <<<REQUEST
+POST /_replicate HTTP/1.0
+Content-Length: $content_length
+Connection: Close
+Content-Type: application/json
+
+$json
+REQUEST;
+	}
+	
+	public function __toString()
+	{
+		return 'Replicate';
+	}
+}
 ?>
