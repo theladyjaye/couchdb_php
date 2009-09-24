@@ -49,7 +49,7 @@ class CouchDBResponse
 	public static function responseWithData($data)
 	{
 		$response = new CouchDBResponse();
-		$response->setData($data);
+		$response->setData($data, $log);
 		return $response;
 	}
 	
@@ -95,7 +95,7 @@ class CouchDBResponse
 		
 		$this->_result = couchdb_json_decode($this->_data);
 			
-		if(isset($this->_result['error']))
+		if(is_array($this->_result) && isset($this->_result['error']))
 		{
 			$this->_error = array('error'=>$this->_result['error'], 'reason'=>$this->_result['reason']);
 		}

@@ -55,6 +55,7 @@ class Info implements CouchDBCommand
 	{
 		return <<<REQUEST
 GET /$this->database/ HTTP/1.0
+{authorization}
 
 
 REQUEST;

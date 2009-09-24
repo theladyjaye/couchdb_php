@@ -57,6 +57,7 @@ class CreateDatabase implements CouchDBCommand
 		return <<<REQUEST
 PUT /$this->value HTTP/1.0
 Connection: close
+{authorization}
 
 
 REQUEST;

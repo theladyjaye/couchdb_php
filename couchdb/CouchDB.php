@@ -45,6 +45,8 @@ require 'commands/DeleteDocument.php';
 require 'commands/CreateDatabase.php';
 require 'commands/DeleteDatabase.php';
 require 'commands/Replicate.php';
+require 'commands/AdminCreate.php';
+require 'commands/AdminDelete.php';
 require 'commands/Compact.php';
 require 'net/CouchDBConnection.php';
 require 'net/CouchDBResponse.php';
@@ -70,13 +72,18 @@ class CouchDB
 	 * 'port'
 	 * 'timeout'
 	 * 'transport'
-	 * All have default values with the exception of 'database'
+	 * 'authorization'
+	 * 'username'
+	 * 'password'
+	 *
+	 * All have default values with the exception of 'database', 'authorization', 'username', 'password'
 	 * 
 	 * @see CouchDBConnection::__construct()
 	 * 
 	 * @param array $options 
 	 * @author Adam Venturella
 	 * @example ../samples/setup/connect.php Sample instantiation.
+	 * @example ../samples/setup/connect_basic_auth.php Sample instantiation with Basic Auth.
 	 */
 	public function __construct($options=null)
 	{
@@ -401,6 +408,32 @@ class CouchDB
 		return $this->put($document, $id);
 	}
 	
+	/*
+		TODO Flush these 2 guys out. Note thatlisting views differs significantly from 0.9 to 0.10
+	*/
+	
+	/*
+	public function create_show()
+	{
+	
+	}
+	
+	public function create_list()
+	{
+	
+	}
+	
+	public function list()
+	{
+		
+	}
+	
+	public function show()
+	{
+		
+	}
+	*/
+	
 	/**
 	 * Get a View
 	 * See Querying Options
@@ -598,6 +631,37 @@ class CouchDB
 	}
 	
 	/**
+	 * Create an administrator
+	 *
+	 * @param string $username  
+	 * @param string $password 
+	 * @return CouchDBResponse
+	 * @author Adam Venturella
+	 * @example ../samples/setup/admin_create.php Create an administrator - Basic Auth
+	 */
+	public function admin_create($username, $password)
+	{
+		$connection = new CouchDBConnection($this->connectionOptions);
+		$response   = $connection->execute(new AdminCreate($username, $password));
+		return $response;
+	}
+	
+	/**
+	 * Delete an administrator
+	 *
+	 * @param string $username
+	 * @return CouchDBResponse
+	 * @author Adam Venturella
+	 * @example ../samples/setup/admin_create.php Delete an administrator
+	 */
+	public function admin_delete($username)
+	{
+		$connection = new CouchDBConnection($this->connectionOptions);
+		$response   = $connection->execute(new AdminDelete($username));
+		return $response;
+	}
+	
+	/**
 	 * Function that determines weather or not an action should be performed
 	 * on a database.  All CouchDB methods that require an active database
 	 * call this method: CouchDB::document(), CouchDB::put(), CouchDB::delete()
@@ -631,6 +695,7 @@ class CouchDB
 			$this->throw_no_database_exception();
 		}
 	}
+	
 	
 	/**
 	 * Get version information for the current CouchDB server

@@ -32,39 +32,24 @@
 require_once 'CouchDBCommand.php';
 
 /**
- * Delete Attachment Command
+ * Get Server Version Command
  *
  * @package Commands
  * @author Adam Venturella
  */
-class DeleteAttachment implements CouchDBCommand 
+class AdminDelete implements CouchDBCommand 
 {
-	private $database;
-	private $name;
-	private $document;
-	private $revision;
+	public $username;
 	
-	/**
-	 * undocumented function
-	 *
-	 * @param string $database 
-	 * @param string $document 
-	 * @param string $name 
-	 * @param string $revision 
-	 * @author Adam Venturella
-	 */
-	public function __construct($database, $document, $name, $revision)
+	public function __construct($username)
 	{
-		$this->database     = $database;
-		$this->name         = $name;
-		$this->document     = $document;
-		$this->revision     = $revision;
+		$this->username = $username;
 	}
 	
 	public function request()
 	{
 		return <<<REQUEST
-DELETE /$this->database/$this->document/$this->name?rev=$this->revision HTTP/1.0
+DELETE /_config/admins/$this->username HTTP/1.0
 Connection: close
 {authorization}
 
@@ -74,7 +59,7 @@ REQUEST;
 	
 	public function __toString()
 	{
-		return 'DeleteAttachment';
+		return 'AdminDelete';
 	}
 }
 ?>

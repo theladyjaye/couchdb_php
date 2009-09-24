@@ -44,6 +44,7 @@ class Version implements CouchDBCommand
 		return <<<REQUEST
 GET / HTTP/1.0
 Connection: close
+{authorization}
 
 
 REQUEST;

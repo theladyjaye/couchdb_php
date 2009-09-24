@@ -64,6 +64,7 @@ class DeleteDocument implements CouchDBCommand
 		return <<<REQUEST
 DELETE /$this->database/$this->id HTTP/1.0
 If-Match: "$this->revision"
+{authorization}
 
 
 REQUEST;

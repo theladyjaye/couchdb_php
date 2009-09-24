@@ -40,6 +40,9 @@ class CouchDBConnection
 	private $_port;
 	private $_transport;
 	private $_timeout;
+	private $_authorization;
+	private $_username;
+	private $_password;
 	
 	/**
 	 * undocumented function
@@ -49,11 +52,15 @@ class CouchDBConnection
 	 */
 	public function __construct($options=null)
 	{
-		$this->_database  = isset($options['database'])  ? $options['database']  : null;
-		$this->_host      = isset($options['host'])      ? $options['host']      : '127.0.0.1';
-		$this->_port      = isset($options['port'])      ? $options['port']      : '5984';
-		$this->_timeout   = isset($options['timeout'])   ? $options['timeout']   : 10;
-		$this->_transport = isset($options['transport']) ? $options['transport'] : 'tcp://';
+		$this->_database       = isset($options['database'])        ? $options['database']      : null;
+		$this->_host           = isset($options['host'])            ? $options['host']          : '127.0.0.1';
+		$this->_port           = isset($options['port'])            ? $options['port']          : '5984';
+		$this->_timeout        = isset($options['timeout'])         ? $options['timeout']       : 10;
+		$this->_transport      = isset($options['transport'])       ? $options['transport']     : 'tcp://';
+		$this->_authorization  = isset($options['authorization'])   ? $options['authorization'] : null;
+		$this->_username       = isset($options['username'])        ? $options['username']      : null;
+		$this->_password       = isset($options['password'])        ? $options['password']      : null;
+		
 	}
 	
 	/**
@@ -65,7 +72,20 @@ class CouchDBConnection
 	 */
 	public function execute(CouchDBCommand $command)
 	{
-		$data = $this->connect($command->request());
+		$request = $command->request();
+		
+		// default to a header that won't mean anything
+		$authorization = "X-CouchDBPHP-Authorization-Null: Null";
+		switch($this->_authorization)
+		{
+			case 'basic':
+				$authorization = 'Authorization: Basic '.base64_encode($this->_username.':'.$this->_password);
+				break;
+		}
+		
+		$request = str_replace('{authorization}', $authorization, $request);
+		$data    = $this->connect($request);
+		
 		
 		// maybe change this to not require the class but place a method in the CouchDBCommand 
 		// interface $command->rawResponse() returns bool or something like that.

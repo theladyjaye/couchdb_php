@@ -74,6 +74,7 @@ class View implements CouchDBCommand
 		return <<<REQUEST
 GET $location HTTP/1.0
 Connection: close
+{authorization}
 
 
 REQUEST;

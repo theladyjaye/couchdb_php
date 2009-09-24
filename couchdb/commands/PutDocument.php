@@ -77,6 +77,7 @@ PUT /$this->database/$this->id/$batch HTTP/1.0
 Content-Length: $content_length
 Connection: Close
 Content-Type: application/json
+{authorization}
 
 $this->json
 REQUEST;

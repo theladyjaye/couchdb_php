@@ -61,8 +61,12 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	
 	const kCustomContentType        = 'foo/bar';
 	
+	const kAdminUsername            = 'testadmin';
+	const kAdminPassword            = 'secretpassword';
 	
+	protected $couchdbNoAuth;
 	protected $couchdb;
+	
 	public static $id;
 	public static $id_pdf;
 	
@@ -70,17 +74,19 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	{
 		return implode(DIRECTORY_SEPARATOR, array(__DIR__, CouchDBTest::kAttachmentDirectory, $resource));
 	}
-	/* DATABASE */
 	
 	/**
 	 * @covers CouchDB::__construct
 	 */
 	protected function setUp()
 	{
-		$options = array('database'=>CouchDBTest::kDatabaseName);
-		$this->couchdb = new CouchDB($options);
-		
+		$optionsAuth         = array('database'=>CouchDBTest::kDatabaseName, 'authorization'=>'basic', 'username'=>CouchDBTest::kAdminUsername, 'password'=>CouchDBTest::kAdminPassword);
+		$optionsNoAuth       = array('database'=>CouchDBTest::kDatabaseName);
+		$this->couchdb       = new CouchDB($optionsAuth);
+		$this->couchdbNoAuth = new CouchDB($optionsNoAuth);
 	}
+	
+	/* DATABASE */
 	
 	/**
 	 * @covers CouchDB::__get
@@ -90,10 +96,21 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	public function testDatabaseVersion()
 	{
 		$version = null;
-		$version = $this->couchdb->version;
+		
+		// ignore any authorization
+		
+		$version = $this->couchdbNoAuth->version;
 		$this->assertNotNull($version);
 		
 		echo 'CouchDB Version: '.$version."\n";
+	}
+	
+	/* USERS */
+	public function testAdminCreate()
+	{
+		$response = $this->couchdbNoAuth->admin_create(CouchDBTest::kAdminUsername, CouchDBTest::kAdminPassword);
+		$this->assertEquals('200', $response->headers['status']['code']);
+		$this->assertEquals('OK', $response->headers['status']['message']);
 	}
 	
 	/**
@@ -171,7 +188,7 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 		$couchdb->put($document);
 	}
 	
-	public function testDocumentCeateStdClass()
+	public function testDocumentCreateStdClass()
 	{
 		$document               = new stdClass();
 		$document->label        = 'Test1';
@@ -954,6 +971,12 @@ FUNCTION;
 		
 	}
 	
+	public function testAdminDelete()
+	{
+		$response = $this->couchdb->admin_delete(CouchDBTest::kAdminUsername);
+		$this->assertEquals('200', $response->headers['status']['code']);
+		$this->assertEquals('OK', $response->headers['status']['message']);
+	}
 	
 
 }

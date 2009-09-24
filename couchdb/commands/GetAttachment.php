@@ -63,6 +63,7 @@ class GetAttachment implements CouchDBCommand
 		 return <<<REQUEST
 GET /$this->database/$this->document/$this->name HTTP/1.0
 Connection: close
+{authorization}
 
 
 REQUEST;

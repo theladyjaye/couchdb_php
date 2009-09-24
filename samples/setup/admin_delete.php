@@ -19,7 +19,7 @@
  *
  *    Author: Adam Venturella - aventurella@gmail.com
  *
- *    @package CouchDB_PHP
+ *    @package Sample 
  *    @author Adam Venturella <aventurella@gmail.com>
  *    @copyright Copyright (C) 2009 Adam Venturella
  *    @license http://www.apache.org/licenses/LICENSE-2.0 Apache 2.0
@@ -27,48 +27,15 @@
  **/
 
 /**
- * Includes
+ * Sample
  */
-require_once 'CouchDBCommand.php';
-
-/**
- * Get Document Command
- *
- * @package Commands
- * @author Adam Venturella
- */
-class GetDocument implements CouchDBCommand 
-{
-	private $database;
-	private $id;
 	
-	/**
-	 * undocumented function
-	 *
-	 * @param string $database 
-	 * @param string $id 
-	 * @author Adam Venturella
-	 */
-	public function __construct($database, $id)
-	{
-		$this->database = $database;
-		$this->id       = $id;
-	}
+	require 'couchdb/CouchDB.php';
 	
-	public function request()
-	{
-		return <<<REQUEST
-GET /$this->database/$this->id HTTP/1.0
-Connection: close
-{authorization}
-
-
-REQUEST;
-	}
+	$newdb   = 'newdb';
 	
-	public function __toString()
-	{
-		return 'GetDocument';
-	}
-}
+	// since we are deleting an admin, it means that an admin must already exist, which means basic auth is on.
+	$options = array('database'=>$newdb, 'authorization'=>'basic', 'username'='testadmin', 'password'=>'secretpassword');
+	$db      = new CouchDB($options);
+	$db->admin_delete('testadmin');
 ?>

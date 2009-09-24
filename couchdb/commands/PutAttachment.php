@@ -252,6 +252,7 @@ PUT /$this->database/$this->document/$name?rev=$this->revision HTTP/1.0
 Content-Length: $content_length
 Connection: Close
 Content-Type: $content_type
+{authorization}
 
 $bytes
 REQUEST;
@@ -270,6 +271,7 @@ PUT /$this->database/$this->document/$name HTTP/1.0
 Content-Length: $content_length
 Connection: Close
 Content-Type: $content_type
+{authorization}
 
 $bytes
 REQUEST;
