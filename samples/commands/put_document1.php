@@ -36,7 +36,7 @@
 	$db      = new CouchDB($options);
 	
 	// Document as JSON:
-	$json     = couchdb_json_encode(array('data'=>'hello world'));
+	$json     = json_encode(array('data'=>'hello world'));
 	$result   = $db->put($json);
 	
 	// OR As an Object

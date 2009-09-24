@@ -45,7 +45,7 @@
 	$document['screenname'] = 'lipsum';
 	
 	// As JSON
-	$json                   = couchdb_json_encode($document);
+	$json                   = json_encode($document);
 	$db->put($json, $document_id);
 	
 	// OR As Array:
