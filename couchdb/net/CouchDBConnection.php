@@ -41,6 +41,7 @@ class CouchDBConnection
 	private $_transport;
 	private $_timeout;
 	private $_authorization;
+	private $_authorization_session;
 	private $_username;
 	private $_password;
 	
@@ -52,14 +53,15 @@ class CouchDBConnection
 	 */
 	public function __construct($options=null)
 	{
-		$this->_database       = isset($options['database'])        ? $options['database']      : null;
-		$this->_host           = isset($options['host'])            ? $options['host']          : '127.0.0.1';
-		$this->_port           = isset($options['port'])            ? $options['port']          : '5984';
-		$this->_timeout        = isset($options['timeout'])         ? $options['timeout']       : 10;
-		$this->_transport      = isset($options['transport'])       ? $options['transport']     : 'tcp://';
-		$this->_authorization  = isset($options['authorization'])   ? $options['authorization'] : null;
-		$this->_username       = isset($options['username'])        ? $options['username']      : null;
-		$this->_password       = isset($options['password'])        ? $options['password']      : null;
+		$this->_database               = isset($options['database'])                ? $options['database']              : null;
+		$this->_host                   = isset($options['host'])                    ? $options['host']                  : '127.0.0.1';
+		$this->_port                   = isset($options['port'])                    ? $options['port']                  : '5984';
+		$this->_timeout                = isset($options['timeout'])                 ? $options['timeout']               : 10;
+		$this->_transport              = isset($options['transport'])               ? $options['transport']             : 'tcp://';
+		$this->_authorization          = isset($options['authorization'])           ? $options['authorization']         : null;
+		$this->_authorization_session  = isset($options['authorization_session'])   ? $options['authorization_session'] : null;
+		$this->_username               = isset($options['username'])                ? $options['username']              : null;
+		$this->_password               = isset($options['password'])                ? $options['password']              : null;
 		
 	}
 	
@@ -75,11 +77,27 @@ class CouchDBConnection
 		$request = $command->request();
 		
 		// default to a header that won't mean anything
-		$authorization = "X-CouchDBPHP-Authorization-Null: Null";
+		$authorization = "X-CouchDB-PHP-Authenticate: None";
+		
 		switch($this->_authorization)
 		{
 			case 'basic':
 				$authorization = 'Authorization: Basic '.base64_encode($this->_username.':'.$this->_password);
+				break;
+			
+			case 'cookie':
+				$session = null;
+				
+				if(isset($this->_authorization_session))
+				{
+					$session = $this->_authorization_session;
+				}
+				else if (isset($_COOKIE['AuthSession']))
+				{
+					$session = 'AuthSession='.$_COOKIE['AuthSession'];
+				}
+				
+				$authorization  = "X-CouchDB-WWW-Authenticate: Cookie\r\nCookie: ".$session."\r\n";
 				break;
 		}
 		

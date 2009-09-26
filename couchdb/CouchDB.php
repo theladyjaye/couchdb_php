@@ -47,6 +47,11 @@ require 'commands/DeleteDatabase.php';
 require 'commands/Replicate.php';
 require 'commands/AdminCreate.php';
 require 'commands/AdminDelete.php';
+require 'commands/SessionLogin.php';
+require 'commands/SessionLogout.php';
+require 'commands/UserCreate.php';
+require 'commands/UserDelete.php';
+require 'commands/UserUpdate.php';
 require 'commands/Compact.php';
 require 'net/CouchDBConnection.php';
 require 'net/CouchDBResponse.php';
@@ -73,10 +78,11 @@ class CouchDB
 	 * 'timeout'
 	 * 'transport'
 	 * 'authorization'
+	 * 'authorization_session'
 	 * 'username'
 	 * 'password'
 	 *
-	 * All have default values with the exception of 'database', 'authorization', 'username', 'password'
+	 * All have default values with the exception of 'database', 'authorization', 'authorization_session', 'username', 'password'
 	 * 
 	 * @see CouchDBConnection::__construct()
 	 * 
@@ -659,6 +665,165 @@ class CouchDB
 		$connection = new CouchDBConnection($this->connectionOptions);
 		$response   = $connection->execute(new AdminDelete($username));
 		return $response;
+	}
+	
+	/**
+	 * Create a user
+	 *
+	 * @param string $username 
+	 * @param string $password 
+	 * @param string $email 
+	 * @param array $roles 
+	 * @return CouchDBResponse
+	 * @author Adam Venturella
+	 * @example ../samples/users/user_create.php Create a user
+	 */
+	public function user_create($username, $password, $email, $roles)
+	{
+		$connection = new CouchDBConnection($this->connectionOptions);
+		$response   = $connection->execute(new UserCreate($username, $password, $email, $roles, $extras));
+		return $response;
+	}
+	
+	/**
+	 * Delete a user
+	 *
+	 * @param string $username 
+	 * @return CouchDBResponse
+	 * @author Adam Venturella
+	 * @example ../samples/users/user_delete.php Delete a user
+	 */
+	public function user_delete($username)
+	{
+		$user = $this->user($username);
+		
+		$connection = new CouchDBConnection($this->connectionOptions);
+		$response   = $connection->execute(new UserDelete($user['_id'], $user['_rev']));
+		return $response;
+	}
+	
+	/**
+	 * Update a user's information, you cannot update the user's username
+	 *
+	 * @param string $username 
+	 * @param string $password 
+	 * @param string $old_password 
+	 * @param string $email 
+	 * @param string $roles 
+	 * @return CouchDBResponse
+	 * @author Adam Venturella
+	 * @example ../samples/users/user_update.php Update a user's account
+	 */
+	public function user_update($username, $password=null, $old_password=null, $email=null, $roles=null)
+	{
+		$connection = new CouchDBConnection($this->connectionOptions);
+		$response   = $connection->execute(new UserUpdate($username, $password, $old_password, $email, $roles));
+		return $response;
+	}
+	
+	/**
+	 * Get a user
+	 *
+	 * @param string $username 
+	 * @param string $json 
+	 * @return array
+	 * @author Adam Venturella
+	 * @example ../samples/users/user_info.php Get info on a user
+	 */
+	public function user($username, $json=false)
+	{
+		$connection = new CouchDBConnection($this->connectionOptions);
+		$response   = $connection->execute(new View('users', '_auth/users', array('key'=>$username)));
+		if($json)
+		{
+			return $response->data;
+		}
+		else
+		{
+			$view = CouchDBView::viewWithJSON($response->data);
+			return $view[0]['value'];
+		}
+	}
+	
+	/**
+	 * Log a user into a session, set the session cookie if desired
+	 *
+	 * @param string $username 
+	 * @param string $password
+	 * @param boolean $setcookie 
+	 * @return string | null
+	 * @author Adam Venturella
+	 * @example ../samples/users/session_login.php Create a user session
+	 */
+	public function session_login($username, $password, $setcookie=false)
+	{
+		$session       = null;
+		$connection    = new CouchDBConnection($this->connectionOptions);
+		try
+		{
+			$response      = $connection->execute(new SessionLogin($username, $password));
+		}
+		catch(Exception $e){}
+		
+		if(isset($response->headers['Set-Cookie']) && strpos($response->headers['Set-Cookie'], 'AuthSession') !== false)
+		{
+			if(!$this->connectionOptions)
+			{
+				$this->connectionOptions = array();
+			}
+
+			$session = $response->headers['Set-Cookie'];
+			
+			$this->connectionOptions['authorization']          = 'cookie';
+			$this->connectionOptions['authorization_session']  = $session;
+
+			if($setcookie)
+			{
+				header('Set-Cookie: '.$session);
+			}
+		}
+		
+		return $session;
+	}
+	
+	/**
+	 * Log a user out of a session, set the logout cookie if desired
+	 *
+	 * @param boolean $setcookie
+	 * @return string | null
+	 * @author Adam Venturella
+	 * @example ../samples/users/session_logout.php Destroy a user session
+	 */
+	public function session_logout($setcookie=false)
+	{
+		$session    = null;
+		$connection = new CouchDBConnection($this->connectionOptions);
+		$response   = $connection->execute(new SessionLogout());
+		
+		if($response->headers['status']['code'] == 200)
+		{
+			if($this->connectionOptions['authorization'] == 'cookie')
+			{
+				$this->connectionOptions['authorization'] = null;
+			}
+			
+			if(isset($this->connectionOptions['authorization_session']))
+			{
+				$this->connectionOptions['authorization_session'] = null;
+			}
+			
+			if(isset($response->headers['Set-Cookie']) && strpos($response->headers['Set-Cookie'], 'AuthSession') !== false)
+			{
+				$session = $response->headers['Set-Cookie'];
+				
+				if($setcookie)
+				{
+					header('Set-Cookie: '.$session);
+				}
+			}
+		}
+		
+		return $session;
 	}
 	
 	/**

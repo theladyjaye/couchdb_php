@@ -38,6 +38,7 @@ class CouchDBResponse
 	private $_data;
 	private $_error;
 	private $_result;
+	private $_raw_headers;
 	
 	/**
 	 * undocumented function
@@ -49,7 +50,7 @@ class CouchDBResponse
 	public static function responseWithData($data)
 	{
 		$response = new CouchDBResponse();
-		$response->setData($data, $log);
+		$response->setData($data);
 		return $response;
 	}
 	
@@ -125,6 +126,7 @@ class CouchDBResponse
 	 */
 	private function processHeaders($headers)
 	{
+		$this->_raw_headers = $headers;
 		
 		$headers = explode("\r\n", $headers);
 		
@@ -156,6 +158,10 @@ class CouchDBResponse
 	{
 		switch($value)
 		{
+			case 'raw_headers':
+				return $this->_raw_headers;
+				break;
+				
 			case 'headers':
 				return $this->_headers;
 				break;

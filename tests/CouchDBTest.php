@@ -1,4 +1,15 @@
 <?php
+/* 
+	// users -- needs : password_sha
+	POST /_session -d 'username=foo&password=bar' to get the AuthSession cookie
+	
+	eric@thelog:~$ curl -X GET http://oYeZDICkHV:pwadmin@localhost:5988/users/luser
+	{"_id":"luser","_rev":"2-3d5791248864646ce3243e233fb6906f","username":"luser","roles":["gnome"],"password":"shh"}
+	eric@thelog:~$ curl -X GET http://oYeZDICkHV:pwadmin@localhost:5988/users/_local%2F_acl
+	{"_id":"_local/_acl","_rev":"0-2","rules":[{"db":"*","role":"_admin","allow":"write"},{"db":"test","role":"gnome","allow":"write"}]}
+	eric@thelog:~$ curl -X GET http://luser:shh@localhost:5988/test
+	{"error":"unauthorized","reason":"Name or password is incorrect."}
+*/
 /**
  *    CouchDB_PHP
  * 
@@ -27,6 +38,7 @@
  **/
 require_once 'PHPUnit/Framework.php';
 require_once 'couchdb/CouchDB.php';
+require_once 'CouchDBTestConstants.php';
 	
 class CouchDBTest extends PHPUnit_Framework_TestCase
 {
@@ -61,8 +73,11 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	
 	const kCustomContentType        = 'foo/bar';
 	
-	const kAdminUsername            = 'testadmin';
-	const kAdminPassword            = 'secretpassword';
+	const kAdminPrimaryUsername     = 'admin';
+	const kAdminPrimaryPassword     = 'admin';
+	
+	const kAdminSecondaryUsername   = 'testadmin';
+	const kAdminSecondaryPassword   = 'secretpassword';
 	
 	protected $couchdbNoAuth;
 	protected $couchdb;
@@ -72,7 +87,7 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	
 	protected function pathForResource($resource)
 	{
-		return implode(DIRECTORY_SEPARATOR, array(__DIR__, CouchDBTest::kAttachmentDirectory, $resource));
+		return implode(DIRECTORY_SEPARATOR, array(__DIR__, CouchDBTestConstants::kAttachmentDirectory, $resource));
 	}
 	
 	/**
@@ -80,13 +95,13 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	 */
 	protected function setUp()
 	{
-		$optionsAuth         = array('database'=>CouchDBTest::kDatabaseName, 'authorization'=>'basic', 'username'=>CouchDBTest::kAdminUsername, 'password'=>CouchDBTest::kAdminPassword);
-		$optionsNoAuth       = array('database'=>CouchDBTest::kDatabaseName);
+		$optionsAuth         = array('database'=>CouchDBTestConstants::kDatabaseName, 'authorization'=>'basic', 'username'=>CouchDBTestConstants::kAdminPrimaryUsername, 'password'=>CouchDBTestConstants::kAdminPrimaryPassword);
+		$optionsNoAuth       = array('database'=>CouchDBTestConstants::kDatabaseName);
 		$this->couchdb       = new CouchDB($optionsAuth);
 		$this->couchdbNoAuth = new CouchDB($optionsNoAuth);
 	}
 	
-	/* DATABASE */
+	/* VERSION */
 	
 	/**
 	 * @covers CouchDB::__get
@@ -99,20 +114,33 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 		
 		// ignore any authorization
 		
-		$version = $this->couchdbNoAuth->version;
+		$version = $this->couchdb->version;
 		$this->assertNotNull($version);
 		
 		echo 'CouchDB Version: '.$version."\n";
 	}
 	
 	/* USERS */
-	public function testAdminCreate()
+	/*public function testAdminCreate()
 	{
-		$response = $this->couchdbNoAuth->admin_create(CouchDBTest::kAdminUsername, CouchDBTest::kAdminPassword);
+		$response = $this->couchdb->admin_create(CouchDBTestConstants::kAdminSecondaryUsername, CouchDBTestConstants::kAdminSecondaryPassword);
+		$this->assertEquals('200', $response->headers['status']['code']);
+		$this->assertEquals('OK', $response->headers['status']['message']);
+	}
+	public function testAdminDelete()
+	{
+		$response = $this->couchdb->admin_delete(CouchDBTestConstants::kAdminSecondaryUsername);
 		$this->assertEquals('200', $response->headers['status']['code']);
 		$this->assertEquals('OK', $response->headers['status']['message']);
 	}
 	
+	public function testSessionLogin()
+	{
+		$response = $this->couchdb->session_login('auser', 'shhh');
+		print_r($response);
+	}*/
+	
+	/* DATABASE */
 	/**
 	 * @expectedException Exception
 	 */
@@ -125,11 +153,11 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	
 	public function testDatabaseCreationWithValue()
 	{
-		$this->couchdb->create_database(CouchDBTest::kAltDatabaseName);
-		$info = $this->couchdb->info(CouchDBTest::kAltDatabaseName);
+		$this->couchdb->create_database(CouchDBTestConstants::kAltDatabaseName);
+		$info = $this->couchdb->info(CouchDBTestConstants::kAltDatabaseName);
 		
 		$this->assertType(PHPUnit_Framework_Constraint_IsType::TYPE_ARRAY, $info);
-		$this->assertEquals($info['db_name'], CouchDBTest::kAltDatabaseName);
+		$this->assertEquals($info['db_name'], CouchDBTestConstants::kAltDatabaseName);
 	}
 	
 	/**
@@ -137,8 +165,8 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	 */
 	public function testDatabaseDeleteWithValue()
 	{
-		$this->couchdb->delete_database(CouchDBTest::kAltDatabaseName);
-		$info = $this->couchdb->info(CouchDBTest::kAltDatabaseName);
+		$this->couchdb->delete_database(CouchDBTestConstants::kAltDatabaseName);
+		$info = $this->couchdb->info(CouchDBTestConstants::kAltDatabaseName);
 	}
 	
 	/**
@@ -148,10 +176,10 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	public function testDatabaseCreationWithDefaultOptions()
 	{
 		$this->couchdb->create_database();
-		$info = $this->couchdb->info(CouchDBTest::kDatabaseName);
+		$info = $this->couchdb->info(CouchDBTestConstants::kDatabaseName);
 		
 		$this->assertType(PHPUnit_Framework_Constraint_IsType::TYPE_ARRAY, $info);
-		$this->assertEquals($info['db_name'], CouchDBTest::kDatabaseName);
+		$this->assertEquals($info['db_name'], CouchDBTestConstants::kDatabaseName);
 	}
 	
 	/* DOCUMENTS */
@@ -181,7 +209,7 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	{
 		$document               = new stdClass();
 		$document->label        = 'Test0';
-		$document->type         = CouchDBTest::kDefaultType;
+		$document->type         = CouchDBTestConstants::kDefaultType;
 		$document->creationDate = date('c', time());
 		
 		$couchdb = new CouchDB();
@@ -192,7 +220,7 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	{
 		$document               = new stdClass();
 		$document->label        = 'Test1';
-		$document->type         = CouchDBTest::kDefaultType;
+		$document->type         = CouchDBTestConstants::kDefaultType;
 		$document->creationDate = date('c', time());
 		
 		$result  = $this->couchdb->put($document);
@@ -207,7 +235,7 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	{
 		$document                 = array();
 		$document['label']        = 'Test2';
-		$document['type']         = CouchDBTest::kDefaultType;
+		$document['type']         = CouchDBTestConstants::kDefaultType;
 		$document['creationDate'] = date('c', time());
 		
 		$result  = $this->couchdb->put($document);
@@ -221,7 +249,7 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	{
 		$document                 = array();
 		$document['label']        = 'Test3';
-		$document['type']         = CouchDBTest::kDefaultType;
+		$document['type']         = CouchDBTestConstants::kDefaultType;
 		$document['creationDate'] = date('c', time());
 		
 		$result  = $this->couchdb->put(json_encode($document));
@@ -237,14 +265,14 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 		
 		$this->assertNotNull($document['type']);
 		$this->assertEquals($document['_id'], CouchDBTest::$id);
-		$this->assertEquals($document['type'], CouchDBTest::kDefaultType);
+		$this->assertEquals($document['type'], CouchDBTestConstants::kDefaultType);
 		$this->assertNotNull($document['_rev']);
 		$this->assertNotNull($document['label']);
 		
 		$this->assertNotNull($document['creationDate']);
 		
-		$document['type']  = CouchDBTest::kUpdateType;
-		$document['email'] = CouchDBTest::kEmailAddress;
+		$document['type']  = CouchDBTestConstants::kUpdateType;
+		$document['email'] = CouchDBTestConstants::kEmailAddress;
 		
 		$result            = $this->couchdb->put($document, CouchDBTest::$id);
 		
@@ -253,8 +281,8 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 		
 		$document = $this->couchdb->document(CouchDBTest::$id);
 		
-		$this->assertEquals($document['type'], CouchDBTest::kUpdateType);
-		$this->assertEquals($document['email'], CouchDBTest::kEmailAddress);
+		$this->assertEquals($document['type'], CouchDBTestConstants::kUpdateType);
+		$this->assertEquals($document['email'], CouchDBTestConstants::kEmailAddress);
 	}
 	
 	/* ATTACHMENTS */
@@ -265,7 +293,7 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	public function testDocumentGetAttachmentWithNoDatabaseOption()
 	{
 		$couchdb = new CouchDB();
-		$couchdb->attachment(CouchDBTest::$id, CouchDBTest::kAttachmentName2);
+		$couchdb->attachment(CouchDBTest::$id, CouchDBTestConstants::kAttachmentName2);
 	}
 	
 	/**
@@ -274,7 +302,7 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	public function testDocumentDeleteAttachmentWithNoDatabaseOption()
 	{
 		$couchdb = new CouchDB();
-		$couchdb->delete_attachment(CouchDBTest::$id, CouchDBTest::kAttachmentName2);
+		$couchdb->delete_attachment(CouchDBTest::$id, CouchDBTestConstants::kAttachmentName2);
 	}
 	
 	/**
@@ -283,8 +311,8 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	public function testDocumentPutAttachmentWithNoDatabaseOption()
 	{
 		$attachment       = new stdClass();
-		$attachment->name = CouchDBTest::kAttachmentName1;
-		$attachment->path = $this->pathForResource(CouchDBTest::kAttachmentFilename1);
+		$attachment->name = CouchDBTestConstants::kAttachmentName1;
+		$attachment->path = $this->pathForResource(CouchDBTestConstants::kAttachmentFilename1);
 		
 		$couchdb = new CouchDB();
 		$couchdb->put_attachment($attachment);
@@ -293,8 +321,8 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	public function testDocumentUpdateWithAttachmentAsStdClassPNG()
 	{
 		$attachment       = new stdClass();
-		$attachment->name = CouchDBTest::kAttachmentName1;
-		$attachment->path = $this->pathForResource(CouchDBTest::kAttachmentFilename1);
+		$attachment->name = CouchDBTestConstants::kAttachmentName1;
+		$attachment->path = $this->pathForResource(CouchDBTestConstants::kAttachmentFilename1);
 		$result = $this->couchdb->put_attachment($attachment, CouchDBTest::$id);
 		$this->assertEquals($result['ok'], true);
 	}
@@ -302,7 +330,7 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	public function testDocumentUpdateWithAttachmentAsStdClassPNGNoName()
 	{
 		$attachment       = new stdClass();
-		$attachment->path = $this->pathForResource(CouchDBTest::kAttachmentFilename1);
+		$attachment->path = $this->pathForResource(CouchDBTestConstants::kAttachmentFilename1);
 		$result = $this->couchdb->put_attachment($attachment);
 		$this->assertEquals($result['ok'], true);
 		$id = $result['id'];
@@ -313,8 +341,8 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	
 	public function testDocumentGetAttachmentPNG()
 	{
-		$original_path   = $this->pathForResource(CouchDBTest::kAttachmentFilename1);
-		$attachment      = $this->couchdb->attachment(CouchDBTest::$id, CouchDBTest::kAttachmentName1);
+		$original_path   = $this->pathForResource(CouchDBTestConstants::kAttachmentFilename1);
+		$attachment      = $this->couchdb->attachment(CouchDBTest::$id, CouchDBTestConstants::kAttachmentName1);
 		$data1           = hash('md5', $attachment);
 		$data2           = hash('md5', file_get_contents($original_path));
 		
@@ -324,8 +352,8 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	public function testDocumentUpdateWithAdditionalAttachmentAsArrayPNG()
 	{
 		$attachment         = array();
-		$attachment['name'] = CouchDBTest::kAttachmentName2;
-		$attachment['path'] = $this->pathForResource(CouchDBTest::kAttachmentFilename2);
+		$attachment['name'] = CouchDBTestConstants::kAttachmentName2;
+		$attachment['path'] = $this->pathForResource(CouchDBTestConstants::kAttachmentFilename2);
 		$result = $this->couchdb->put_attachment($attachment, CouchDBTest::$id);
 		$this->assertEquals($result['ok'], true);
 	}
@@ -333,7 +361,7 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	public function testDocumentUpdateWithAttachmentAsArrayPNGNoName()
 	{
 		$attachment         = array();
-		$attachment['path'] = $this->pathForResource(CouchDBTest::kAttachmentFilename2);
+		$attachment['path'] = $this->pathForResource(CouchDBTestConstants::kAttachmentFilename2);
 		$result = $this->couchdb->put_attachment($attachment);
 		$this->assertEquals($result['ok'], true);
 		$id = $result['id'];
@@ -344,8 +372,8 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	
 	public function testDocumentGetAdditionalAttachmentPNG()
 	{
-		$original_path   = $this->pathForResource(CouchDBTest::kAttachmentFilename2);
-		$attachment      = $this->couchdb->attachment(CouchDBTest::$id, CouchDBTest::kAttachmentName2);
+		$original_path   = $this->pathForResource(CouchDBTestConstants::kAttachmentFilename2);
+		$attachment      = $this->couchdb->attachment(CouchDBTest::$id, CouchDBTestConstants::kAttachmentName2);
 		$data1           = hash('md5', $attachment);
 		$data2           = hash('md5', file_get_contents($original_path));
 		
@@ -361,20 +389,20 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	
 	public function testDocumentDeleteAttachmentPNG()
 	{
-		$result = $this->couchdb->delete_attachment(CouchDBTest::$id, CouchDBTest::kAttachmentName2);
+		$result = $this->couchdb->delete_attachment(CouchDBTest::$id, CouchDBTestConstants::kAttachmentName2);
 		$this->assertEquals($result['ok'], true);
 		
 		$document   = $this->couchdb->document(CouchDBTest::$id);
-		$this->assertArrayHasKey(CouchDBTest::kAttachmentName1, $document['_attachments']);
-		$this->assertArrayNotHasKey(CouchDBTest::kAttachmentName2, $document['_attachments']);
+		$this->assertArrayHasKey(CouchDBTestConstants::kAttachmentName1, $document['_attachments']);
+		$this->assertArrayNotHasKey(CouchDBTestConstants::kAttachmentName2, $document['_attachments']);
 	}
 	
 	public function testDocumentCreateWithAttachmentPNG()
 	{
 		
 		$attachment       = new stdClass();
-		$attachment->name = CouchDBTest::kAttachmentName1;
-		$attachment->path = $this->pathForResource(CouchDBTest::kAttachmentFilename1);
+		$attachment->name = CouchDBTestConstants::kAttachmentName1;
+		$attachment->path = $this->pathForResource(CouchDBTestConstants::kAttachmentFilename1);
 		
 		$result = $this->couchdb->put_attachment($attachment);
 		$this->assertEquals($result['ok'], true);
@@ -382,11 +410,11 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 		$id = $result['id'];
 		
 		$document = $this->couchdb->document($id);
-		$this->assertArrayHasKey(CouchDBTest::kAttachmentName1, $document['_attachments']);
+		$this->assertArrayHasKey(CouchDBTestConstants::kAttachmentName1, $document['_attachments']);
 		
 		
-		$original_path = $this->pathForResource(CouchDBTest::kAttachmentFilename1);
-		$data1         = hash('md5', $this->couchdb->attachment($id, CouchDBTest::kAttachmentName1));
+		$original_path = $this->pathForResource(CouchDBTestConstants::kAttachmentFilename1);
+		$data1         = hash('md5', $this->couchdb->attachment($id, CouchDBTestConstants::kAttachmentName1));
 		$data2         = hash('md5', file_get_contents($original_path));
 		
 		$this->assertEquals($data1, $data2);
@@ -395,8 +423,8 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	public function testDocumentCreateWithAttachmentHTML()
 	{
 		
-		$key              = CouchDBTest::kAttachmentNameHTML;
-		$filename         = CouchDBTest::kAttachmentFilenameHTML;
+		$key              = CouchDBTestConstants::kAttachmentNameHTML;
+		$filename         = CouchDBTestConstants::kAttachmentFilenameHTML;
 		$content_type     = 'text/html';
 		
 		$result = $this->putAttachment($key, $filename);
@@ -409,8 +437,8 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	public function testDocumentCreateWithAttachmentXML()
 	{
 		
-		$key              = CouchDBTest::kAttachmentNameXML;
-		$filename         = CouchDBTest::kAttachmentFilenameXML;
+		$key              = CouchDBTestConstants::kAttachmentNameXML;
+		$filename         = CouchDBTestConstants::kAttachmentFilenameXML;
 		$content_type     = 'text/xml';
 		
 		$result = $this->putAttachment($key, $filename);
@@ -423,8 +451,8 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	public function testDocumentCreateWithAttachmentRSS()
 	{
 		
-		$key              = CouchDBTest::kAttachmentNameRSS;
-		$filename         = CouchDBTest::kAttachmentFilenameRSS;
+		$key              = CouchDBTestConstants::kAttachmentNameRSS;
+		$filename         = CouchDBTestConstants::kAttachmentFilenameRSS;
 		$content_type     = 'application/rss+xml';
 		
 		$result = $this->putAttachment($key, $filename);
@@ -437,8 +465,8 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	public function testDocumentCreateWithAttachmentATOM()
 	{
 		
-		$key              = CouchDBTest::kAttachmentNameATOM;
-		$filename         = CouchDBTest::kAttachmentFilenameATOM;
+		$key              = CouchDBTestConstants::kAttachmentNameATOM;
+		$filename         = CouchDBTestConstants::kAttachmentFilenameATOM;
 		$content_type     = 'application/atom+xml';
 		
 		$result = $this->putAttachment($key, $filename);
@@ -451,8 +479,8 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	public function testDocumentCreateWithAttachmentPY()
 	{
 		
-		$key              = CouchDBTest::kAttachmentNamePY;
-		$filename         = CouchDBTest::kAttachmentFilenamePY;
+		$key              = CouchDBTestConstants::kAttachmentNamePY;
+		$filename         = CouchDBTestConstants::kAttachmentFilenamePY;
 		$content_type     = 'text/plain';
 		
 		$result = $this->putAttachment($key, $filename);
@@ -465,8 +493,8 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	public function testDocumentCreateWithAttachmentPHP()
 	{
 		
-		$key              = CouchDBTest::kAttachmentNamePHP;
-		$filename         = CouchDBTest::kAttachmentFilenamePHP;
+		$key              = CouchDBTestConstants::kAttachmentNamePHP;
+		$filename         = CouchDBTestConstants::kAttachmentFilenamePHP;
 		$content_type     = 'text/plain';
 		
 		$result = $this->putAttachment($key, $filename);
@@ -479,8 +507,8 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	public function testDocumentCreateWithAttachmentPDF()
 	{
 		
-		$key              = CouchDBTest::kAttachmentNamePDF;
-		$filename         = CouchDBTest::kAttachmentFilenamePDF;
+		$key              = CouchDBTestConstants::kAttachmentNamePDF;
+		$filename         = CouchDBTestConstants::kAttachmentFilenamePDF;
 		$content_type     = 'application/pdf';
 		
 		$result = $this->putAttachment($key, $filename);
@@ -494,9 +522,9 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	{
 		
 		$attachment                   = new stdClass();
-		$attachment->name             = CouchDBTest::kAttachmentNameXML;
-		$attachment->path             = $this->pathForResource(CouchDBTest::kAttachmentFilenameXML);
-		$attachment->content_type     = CouchDBTest::kCustomContentType;
+		$attachment->name             = CouchDBTestConstants::kAttachmentNameXML;
+		$attachment->path             = $this->pathForResource(CouchDBTestConstants::kAttachmentFilenameXML);
+		$attachment->content_type     = CouchDBTestConstants::kCustomContentType;
 		
 		$result = $this->couchdb->put_attachment($attachment, CouchDBTest::$id);
 		$this->assertEquals($result['ok'], true);
@@ -504,8 +532,8 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 		$id = $result['id'];
 		$document = $this->couchdb->document($id);
 		
-		$this->assertArrayHasKey(CouchDBTest::kAttachmentNameXML, $document['_attachments']);
-		$this->assertEquals($document['_attachments'][CouchDBTest::kAttachmentNameXML]['content_type'], CouchDBTest::kCustomContentType);
+		$this->assertArrayHasKey(CouchDBTestConstants::kAttachmentNameXML, $document['_attachments']);
+		$this->assertEquals($document['_attachments'][CouchDBTestConstants::kAttachmentNameXML]['content_type'], CouchDBTestConstants::kCustomContentType);
 	}
 	
 	private function putAttachment($key, $filename)
@@ -540,7 +568,7 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	
 	public function testViewCreate()
 	{
-		$type = CouchDBTest::kDefaultType;
+		$type = CouchDBTestConstants::kDefaultType;
 		$map = <<<FUNCTION
 		function(doc) 
 		{ 
@@ -558,7 +586,7 @@ FUNCTION;
 	
 	public function testViewCreateWithReduce()
 	{
-		$type = CouchDBTest::kDefaultType;
+		$type = CouchDBTestConstants::kDefaultType;
 		$map = <<<FUNCTION
 		function(doc) 
 		{ 
@@ -583,7 +611,7 @@ FUNCTION;
 	
 	public function testViewCreateUpdate()
 	{
-		$type = CouchDBTest::kUpdateType;
+		$type = CouchDBTestConstants::kUpdateType;
 		$map = <<<FUNCTION
 		function(doc) 
 		{ 
@@ -683,8 +711,8 @@ FUNCTION;
 	
 	public function testTempView3()
 	{
-		$default = CouchDBTest::kDefaultType;
-		$update  = CouchDBTest::kUpdateType;
+		$default = CouchDBTestConstants::kDefaultType;
+		$update  = CouchDBTestConstants::kUpdateType;
 		
 		$map = <<<FUNCTION
 		function(doc) 
@@ -704,7 +732,7 @@ FUNCTION;
 	
 	public function testTempView1()
 	{
-		$update  = CouchDBTest::kUpdateType;
+		$update  = CouchDBTestConstants::kUpdateType;
 		
 		$map = <<<FUNCTION
 		function(doc) 
@@ -724,8 +752,8 @@ FUNCTION;
 	
 	public function testTempViewWithKey()
 	{
-		$default = CouchDBTest::kDefaultType;
-		$update  = CouchDBTest::kUpdateType;
+		$default = CouchDBTestConstants::kDefaultType;
+		$update  = CouchDBTestConstants::kUpdateType;
 		
 		$map = <<<FUNCTION
 		function(doc) 
@@ -744,8 +772,8 @@ FUNCTION;
 	
 	public function testTempViewWithReduce()
 	{
-		$default = CouchDBTest::kDefaultType;
-		$update  = CouchDBTest::kUpdateType;
+		$default = CouchDBTestConstants::kDefaultType;
+		$update  = CouchDBTestConstants::kUpdateType;
 		
 		$map = <<<FUNCTION
 		function(doc) 
@@ -774,8 +802,8 @@ FUNCTION;
 	 */
 	public function testTempViewWithNoDatabaseOption()
 	{
-		$default = CouchDBTest::kDefaultType;
-		$update  = CouchDBTest::kUpdateType;
+		$default = CouchDBTestConstants::kDefaultType;
+		$update  = CouchDBTestConstants::kUpdateType;
 		
 		$map = <<<FUNCTION
 		function(doc) 
@@ -796,7 +824,7 @@ FUNCTION;
 	 */
 	public function testViewWithNoDatabaseOption()
 	{
-		$type = CouchDBTest::kUpdateType;
+		$type = CouchDBTestConstants::kUpdateType;
 		$map = <<<FUNCTION
 		function(doc) 
 		{ 
@@ -815,7 +843,7 @@ FUNCTION;
 	
 	public function testCompaction()
 	{
-		$response = $this->couchdb->compact(CouchDBTest::kDatabaseName);
+		$response = $this->couchdb->compact(CouchDBTestConstants::kDatabaseName);
 		$this->assertEquals('202', $response->headers['status']['code']);
 		$this->assertEquals($response->result['ok'], true);
 	}
@@ -833,18 +861,18 @@ FUNCTION;
 	
 	public function testReplication()
 	{
-		$this->couchdb->create_database(CouchDBTest::kAltDatabaseName);
-		$this->couchdb->replicate(CouchDBTest::kDatabaseName, CouchDBTest::kAltDatabaseName);
+		$this->couchdb->create_database(CouchDBTestConstants::kAltDatabaseName);
+		$this->couchdb->replicate(CouchDBTestConstants::kDatabaseName, CouchDBTestConstants::kAltDatabaseName);
 		
-		$info1 = $this->couchdb->info(CouchDBTest::kDatabaseName);
-		$info2 = $this->couchdb->info(CouchDBTest::kAltDatabaseName);
+		$info1 = $this->couchdb->info(CouchDBTestConstants::kDatabaseName);
+		$info2 = $this->couchdb->info(CouchDBTestConstants::kAltDatabaseName);
 		
 		$this->assertEquals($info1['doc_count'], $info2['doc_count']);
 	}
 	
 	public function testReplicationViewDefault()
 	{
-		$replicated = new CouchDB( array('database' => CouchDBTest::kAltDatabaseName) );
+		$replicated = new CouchDB( array('database' => CouchDBTestConstants::kAltDatabaseName) );
 		$result = $replicated->view('records/default');
 		$count  = count($result);
 		$this->assertEquals(2, $count);
@@ -870,7 +898,7 @@ FUNCTION;
 	
 	public function testReplicationViewUpdate()
 	{
-		$replicated = new CouchDB( array('database' => CouchDBTest::kAltDatabaseName) );
+		$replicated = new CouchDB( array('database' => CouchDBTestConstants::kAltDatabaseName) );
 		$result = $replicated->view('records/update');
 		$records = count($result);
 		$this->assertEquals(1, $records);
@@ -878,16 +906,16 @@ FUNCTION;
 	
 	public function testReplicationViewDefaultCount()
 	{
-		$replicated = new CouchDB( array('database' => CouchDBTest::kAltDatabaseName) );
+		$replicated = new CouchDB( array('database' => CouchDBTestConstants::kAltDatabaseName) );
 		$result     = $replicated->view('records/default_count');
 		$this->assertEquals(2, $result[0]['value']);
 	}
 	
 	public function testReplicationAttachment1()
 	{
-		$replicated      = new CouchDB( array('database' => CouchDBTest::kAltDatabaseName) );
-		$original_path   = $this->pathForResource(CouchDBTest::kAttachmentFilename1);
-		$attachment      = $replicated->attachment(CouchDBTest::$id, CouchDBTest::kAttachmentName1);
+		$replicated      = new CouchDB( array('database' => CouchDBTestConstants::kAltDatabaseName) );
+		$original_path   = $this->pathForResource(CouchDBTestConstants::kAttachmentFilename1);
+		$attachment      = $replicated->attachment(CouchDBTest::$id, CouchDBTestConstants::kAttachmentName1);
 		$data1           = hash('md5', $attachment);
 		$data2           = hash('md5', file_get_contents($original_path));
 		
@@ -896,10 +924,10 @@ FUNCTION;
 	
 	public function testReplicationAttachmentPDF()
 	{
-		$replicated      = new CouchDB( array('database' => CouchDBTest::kAltDatabaseName) );
+		$replicated      = new CouchDB( array('database' => CouchDBTestConstants::kAltDatabaseName) );
 		
-		$original_path   = $this->pathForResource(CouchDBTest::kAttachmentFilenamePDF);
-		$attachment      = $replicated->attachment(CouchDBTest::$id_pdf, CouchDBTest::kAttachmentNamePDF);
+		$original_path   = $this->pathForResource(CouchDBTestConstants::kAttachmentFilenamePDF);
+		$attachment      = $replicated->attachment(CouchDBTest::$id_pdf, CouchDBTestConstants::kAttachmentNamePDF);
 		$data1           = hash('md5', $attachment);
 		$data2           = hash('md5', file_get_contents($original_path));
 		
@@ -911,9 +939,9 @@ FUNCTION;
 	 */
 	public function testReplicationAttachment2NotReplicated()
 	{
-		$replicated      = new CouchDB( array('database' => CouchDBTest::kAltDatabaseName) );
-		$original_path   = $this->pathForResource(CouchDBTest::kAttachmentFilename2);
-		$attachment      = $replicated->attachment(CouchDBTest::$id, CouchDBTest::kAttachmentName2);
+		$replicated      = new CouchDB( array('database' => CouchDBTestConstants::kAltDatabaseName) );
+		$original_path   = $this->pathForResource(CouchDBTestConstants::kAttachmentFilename2);
+		$attachment      = $replicated->attachment(CouchDBTest::$id, CouchDBTestConstants::kAttachmentName2);
 	}
 	
 	/**
@@ -921,13 +949,12 @@ FUNCTION;
 	 */
 	public function testReplicationDeleteWithValue()
 	{
-		$this->couchdb->delete_database(CouchDBTest::kAltDatabaseName);
-		$info = $this->couchdb->info(CouchDBTest::kAltDatabaseName);
+		$this->couchdb->delete_database(CouchDBTestConstants::kAltDatabaseName);
+		$info = $this->couchdb->info(CouchDBTestConstants::kAltDatabaseName);
 	}
 	
 	
 	/* CLEANUP */
-	
 	public function testDocumentDelete()
 	{
 		$result = $this->couchdb->delete(CouchDBTest::$id);
@@ -967,15 +994,8 @@ FUNCTION;
 	public function testDatabaseDeleteWithDefaultOptions()
 	{
 		$this->couchdb->delete_database();
-		$info = $this->couchdb->info(CouchDBTest::kDatabaseName);
+		$info = $this->couchdb->info(CouchDBTestConstants::kDatabaseName);
 		
-	}
-	
-	public function testAdminDelete()
-	{
-		$response = $this->couchdb->admin_delete(CouchDBTest::kAdminUsername);
-		$this->assertEquals('200', $response->headers['status']['code']);
-		$this->assertEquals('OK', $response->headers['status']['message']);
 	}
 	
 
