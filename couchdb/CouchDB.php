@@ -53,7 +53,6 @@ require 'commands/UserCreate.php';
 require 'commands/UserDelete.php';
 require 'commands/UserUpdate.php';
 require 'commands/Compact.php';
-require 'commands/ACLManager.php';
 require 'net/CouchDBConnection.php';
 require 'net/CouchDBResponse.php';
 
@@ -746,13 +745,28 @@ class CouchDB
 		}
 	}
 	
+	/**
+	 * Get the _local/_acl
+	 *
+	 * @return CouchDBResponse
+	 * @author Adam Venturella
+	 * @example ../samples/acl/acl_info.php get ACL Document
+	 */
 	public function acl()
 	{
 		$connection = new CouchDBConnection($this->connectionOptions);
 		$response   = $connection->execute(new GetDocument('users', '_local/_acl'));
 		return $response;
 	}
-	
+	/**
+	 * Add ACL Rules to users/_local/_acl
+	 *
+	 * @param $collection An array of arrays representing rules
+	 *                    or an array of objects representing rules
+	 * @return CouchDBResponse
+	 * @author Adam Venturella
+	 * @example ../samples/acl/acl_create.php Create ACL rules
+	 */
 	public function acl_create_rules($collection)
 	{
 		$rules    = array();
@@ -808,6 +822,15 @@ class CouchDB
 		return $response;
 	}
 	
+	/**
+	 * Delete ACL rules from users/_local/_acl
+	 *
+	 * @param array $collection An array of arrays representing rules 
+	 *                          or an array of objects representing rules
+	 * @return CouchDBResponse
+	 * @author Adam Venturella
+	 * @example ../samples/acl/acl_delete.php Delete ACL rules
+	 */
 	public function acl_delete_rules($collection)
 	{
 		static $matchDB    = 2;
@@ -862,6 +885,13 @@ class CouchDB
 		}
 	}
 	
+	/**
+	 * Validate an ACL rule
+	 *
+	 * @param string $rule 
+	 * @return boolean
+	 * @author Adam Venturella
+	 */
 	private function acl_rule_is_valid($rule)
 	{
 		$result = false;
@@ -883,7 +913,9 @@ class CouchDB
 	}
 	
 	/**
-	 * Log a user into a session, set the session cookie if desired
+	 * Log a user into a session, set the session cookie if desired.
+	 * the default AuthSession is 10 minutes.  You can change this in your
+	 * CouchDB config if desired
 	 *
 	 * @param string $username 
 	 * @param string $password
