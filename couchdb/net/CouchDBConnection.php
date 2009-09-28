@@ -118,7 +118,7 @@ class CouchDBConnection
 			$response = CouchDBResponse::responseWithData($data);
 		}
 		
-		if($response->error)
+		/*if($response->error)
 		{
 			throw new Exception('CouchDBCommand('.$command.') Failed with error '.$response->error['error'].': '.$response->error['reason']);
 		}
@@ -126,6 +126,8 @@ class CouchDBConnection
 		{
 			return $response;
 		}
+		*/
+		return $response;
 	}
 	
 	/**

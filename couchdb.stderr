@@ -1,3 +1,8 @@
 
 heart_beat_kill_pid = 2232
 heart_beat_timeout = 11
+
+heart_beat_kill_pid = 2425
+heart_beat_timeout = 11
+heart: Sun Sep 27 14:19:56 2009: heart-beat time-out.
+heart: Sun Sep 27 14:19:59 2009: Executed "/usr/local/bin/couchdb -k". Terminating.

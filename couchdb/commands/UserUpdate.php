@@ -85,12 +85,12 @@ class UserUpdate implements CouchDBCommand
 			}
 		}
 		
-		echo "\n\n".$data."\n\n";
+		//echo "\n\n".$data."\n\n";
 		
 		
 		$content_length = strlen($data);
 		
-		echo <<<REQUEST
+		/*echo <<<REQUEST
 PUT /_user/$username HTTP/1.0
 Content-Length: $content_length
 Connection: Close
@@ -102,6 +102,7 @@ $data
 
 
 REQUEST;
+*/
 		
 		return <<<REQUEST
 PUT /_user/$username HTTP/1.0

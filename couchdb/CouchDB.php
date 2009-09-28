@@ -53,6 +53,7 @@ require 'commands/UserCreate.php';
 require 'commands/UserDelete.php';
 require 'commands/UserUpdate.php';
 require 'commands/Compact.php';
+require 'commands/ACLManager.php';
 require 'net/CouchDBConnection.php';
 require 'net/CouchDBResponse.php';
 
@@ -743,6 +744,142 @@ class CouchDB
 			$view = CouchDBView::viewWithJSON($response->data);
 			return $view[0]['value'];
 		}
+	}
+	
+	public function acl()
+	{
+		$connection = new CouchDBConnection($this->connectionOptions);
+		$response   = $connection->execute(new GetDocument('users', '_local/_acl'));
+		return $response;
+	}
+	
+	public function acl_create_rules($collection)
+	{
+		$rules    = array();
+		$response = null;
+		
+		foreach($collection as $rule)
+		{
+			if($this->acl_rule_is_valid($rule))
+			{
+				//{"db":"*","role":"_admin","allow":"write"}
+				//{"db":"*","role": "test", "allow":"read"}
+				
+				$object = new stdClass();
+				
+				if(is_array($rule))
+				{
+					$object->db    = $rule['db'];
+					$object->role  = $rule['role'];
+					$object->allow = $rule['allow'];
+				}
+				else if (is_object($rule))
+				{
+					$object->db    = $rule->db;
+					$object->role  = $rule->role;
+					$object->allow = $rule->allow;
+				}
+				
+				$rules[] = $object;
+			}
+		}
+		
+		$acl      = $this->acl();
+		$response = null;
+		$id       = '_local/_acl';
+		$batch    = false;
+		
+		if($acl->error)
+		{
+			$document        = new stdClass();
+			$document->rules = $rules;
+			$json            = couchdb_json_encode($document);
+		}
+		else
+		{
+			$document           = $acl->result;
+			$document['rules']  = array_merge($document['rules'], $rules);
+			$json               = couchdb_json_encode($document);
+		}
+		
+		$connection = new CouchDBConnection($this->connectionOptions);
+		$response   = $connection->execute(new PutDocument('users', $json, $id, $batch));
+		
+		return $response;
+	}
+	
+	public function acl_delete_rules($collection)
+	{
+		static $matchDB    = 2;
+		static $matchRole  = 4;
+		static $matchAllow = 8;
+		
+		$matchAll          = $matchDB | $matchRole | $matchAllow;
+		
+		$acl               = $this->acl();
+		$response          = null;
+		
+		if(!$acl->error)
+		{
+			$rules   = array();
+			$document = $acl->result;
+			
+			foreach($document['rules'] as $rule)
+			{
+				foreach($collection as $target)
+				{
+					if(is_object($target)){
+						$target = array('db'=>$target->db, 'role'=>$target->role, 'allow'=>$target->allow);
+					}
+					
+					$match = 0;
+					
+					
+					if($target['db']    == $rule['db'])    $match = $match | $matchDB;
+					if($target['role']  == $rule['role'])  $match = $match | $matchRole;
+					if($target['allow'] == $rule['allow']) $match = $match | $matchAllow;
+
+					if($match != $matchAll)
+					{
+						$key = hash('md5', serialize($rule));
+						if(!isset($rules[$key]))
+						{
+							$rules[$key] = $rule;
+						}
+					}
+				}
+			}
+			$rules = array_values($rules);
+
+			$document['rules'] = $rules;
+			$json              = couchdb_json_encode($document);
+			$id                = '_local/_acl';
+			$batch             = false;
+			$connection        = new CouchDBConnection($this->connectionOptions);
+			$response          = $connection->execute(new PutDocument('users', $json, $id, $batch));
+			
+			return $response;
+		}
+	}
+	
+	private function acl_rule_is_valid($rule)
+	{
+		$result = false;
+		
+		if(is_array($rule))
+		{
+			if(isset($rule['db']) && isset($rule['role']) && isset($rule['allow'])){
+				$result = true;
+			}
+		}
+		else if (is_object($rule))
+		{
+			if(isset($rule->db) && isset($rule->role) && isset($rule->allow)){
+				$result = true;
+			}
+		}
+		
+		return $result;
 	}
 	
 	/**

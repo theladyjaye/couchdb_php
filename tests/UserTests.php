@@ -1,15 +1,4 @@
 <?php
-/* 
-	// users -- needs : password_sha
-	POST /_session -d 'username=foo&password=bar' to get the AuthSession cookie
-	
-	eric@thelog:~$ curl -X GET http://oYeZDICkHV:pwadmin@localhost:5988/users/luser
-	{"_id":"luser","_rev":"2-3d5791248864646ce3243e233fb6906f","username":"luser","roles":["gnome"],"password":"shh"}
-	eric@thelog:~$ curl -X GET http://oYeZDICkHV:pwadmin@localhost:5988/users/_local%2F_acl
-	{"_id":"_local/_acl","_rev":"0-2","rules":[{"db":"*","role":"_admin","allow":"write"},{"db":"test","role":"gnome","allow":"write"}]}
-
-	{"error":"unauthorized","reason":"Name or password is incorrect."}
-*/
 /**
  *    CouchDB_PHP
  * 
@@ -42,9 +31,10 @@ require_once 'CouchDBTestConstants.php';
 
 class UserTests extends PHPUnit_Framework_TestCase
 {
-	protected $couchdb;
-	protected $couchdbLogin;
-	
+	private $couchdb;
+	private $couchdbLogin;
+	private static $startAclCount;
+	private static $resetAcl;
 	/**
 	 * @covers CouchDB::__construct
 	 */
@@ -54,9 +44,77 @@ class UserTests extends PHPUnit_Framework_TestCase
 		$options             = array('authorization'=>'basic', 'username'=>'admin', 'password'=>'admin');
 		$this->couchdb       = new CouchDB($options);
 		$this->couchdbLogin  = new CouchDB();
+		
+		if(UserTests::$startAclCount === null)
+		{
+			$acl = $this->couchdb->acl();
+			
+			if($acl->error)
+			{
+				UserTests::$startAclCount = 0;
+				UserTests::$resetAcl = true;
+			}
+			else
+			{
+				UserTests::$startAclCount = count($acl->result['rules']);
+			}
+		}
 	}
 	
 	/* USERS */
+	public function testAcl()
+	{
+		$acl = $this->couchdb->acl();
+		if(!$acl->error)
+		{
+			$this->assertEquals('_local/_acl', $acl->result['_id']);
+		}
+	} 
+	
+	public function testAclCreate()
+	{
+		$rules  = array(array('db'=>'couchdb_php_testdb1', 'role'=>'user', 'allow'=>'write'),
+		                array('db'=>'couchdb_php_testdb1', 'role'=>'user', 'allow'=>'write'),
+		                array('db'=>'couchdb_php_testdb1', 'role'=>'user', 'allow'=>'write'),
+		                array('db'=>'couchdb_php_testdb2', 'role'=>'user', 'allow'=>'write'));
+		
+		$this->couchdb->acl_create_rules($rules);
+		
+		$acl = $this->couchdb->acl();
+		$this->assertEquals(count($rules), (count($acl->result['rules']) - UserTests::$startAclCount));
+	}
+	
+	public function testAclDelete()
+	{
+		// should remove 3 records
+		$remove  = 3;
+		$created = 4;
+		$total   = $created + UserTests::$startAclCount;
+		
+		$acl = $this->couchdb->acl();
+		
+		$this->couchdb->acl_delete_rules(array(array('db'=>'couchdb_php_testdb1', 'role'=>'user', 'allow'=>'write')));
+		
+		$acl = $this->couchdb->acl();
+		$this->assertEquals(($total-$remove), count($acl->result['rules']));
+		
+		$this->couchdb->acl_delete_rules(array(array('db'=>'couchdb_php_testdb2', 'role'=>'user', 'allow'=>'write')));
+		
+		$acl = $this->couchdb->acl();
+		$this->assertEquals(UserTests::$startAclCount, count($acl->result['rules']));
+		
+		if(UserTests::$resetAcl)
+		{
+			$options    = array('authorization'=>'basic', 'username'=>'admin', 'password'=>'admin');
+			$connection = new CouchDBConnection($options);
+			$response   = $connection->execute(new DeleteDocument('users', '_local/_acl', $acl->result['_rev']));
+			
+			$acl = $this->couchdb->acl();
+			$this->assertNotNull($acl->error);
+		}
+	}
+	
+	/*
 	public function testAdminCreate()
 	{
 		$response = $this->couchdb->admin_create(CouchDBTestConstants::kAdminSecondaryUsername, CouchDBTestConstants::kAdminSecondaryPassword);
@@ -85,7 +143,7 @@ class UserTests extends PHPUnit_Framework_TestCase
 		$this->assertEquals(CouchDBTestConstants::kUserEmail, $user['email']);
 		
 		$count = count($user['roles']);
-		print_r($user);
+		
 		$this->assertEquals(2, $count);
 		$this->assertEquals(CouchDBTestConstants::kUserRole1, $user['roles'][0]);
 		$this->assertEquals(CouchDBTestConstants::kUserRole2, $user['roles'][1]);
@@ -99,8 +157,6 @@ class UserTests extends PHPUnit_Framework_TestCase
 		$this->assertEquals('OK', $response->headers['status']['message']);
 		
 		$user = $this->couchdb->user(CouchDBTestConstants::kUserUsername);
-		
-		print_r($user);
 		$this->assertEquals(urlencode(CouchDBTestConstants::kUserAltEmail), $user['email']);
 		
 		$count = count($user['roles']);
@@ -118,12 +174,12 @@ class UserTests extends PHPUnit_Framework_TestCase
 		$user = $this->couchdb->user(CouchDBTestConstants::kUserUsername);
 		//$this->assertEquals(urlencode(CouchDBTestConstants::kUserAltEmail), $user['email']);
 		
-		print_r($user);
-		/*
-		$count = count($user['roles']);
-		$this->assertEquals(1, $count);
-		$this->assertEquals(CouchDBTestConstants::kUserRole2, $user['roles'][0]);
-		*/
+		//print_r($user);
+		
+		// $count = count($user['roles']);
+		// $this->assertEquals(1, $count);
+		// $this->assertEquals(CouchDBTestConstants::kUserRole2, $user['roles'][0]);
+		
 	}
 	
 	public function testSessionInvalidLogin()
@@ -148,5 +204,480 @@ class UserTests extends PHPUnit_Framework_TestCase
 		$response = $this->couchdb->user_delete(CouchDBTestConstants::kUserUsername);
 		//print_r($response);
 	}
+	*/
 }
 ?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
