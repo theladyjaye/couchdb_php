@@ -106,8 +106,9 @@ REQUEST;
 		
 		return <<<REQUEST
 PUT /_user/$username HTTP/1.0
-Content-Length: $content_length
+Host: {host}
 Connection: Close
+Content-Length: $content_length
 Content-Type: application/x-www-form-urlencoded
 {authorization}
 

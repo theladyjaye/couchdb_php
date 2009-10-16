@@ -65,7 +65,8 @@ class DeleteAttachment implements CouchDBCommand
 	{
 		return <<<REQUEST
 DELETE /$this->database/$this->document/$this->name?rev=$this->revision HTTP/1.0
-Connection: close
+Host: {host}
+Connection: Close
 {authorization}
 
 

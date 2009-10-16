@@ -57,6 +57,7 @@ class Compact implements CouchDBCommand
 		
 		return <<<REQUEST
 POST /$this->database/_compact HTTP/1.0
+Host: {host}
 Connection: Close
 
 

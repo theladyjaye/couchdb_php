@@ -55,7 +55,8 @@ class SessionLogin implements CouchDBCommand
 		
 		return <<<REQUEST
 POST /_session HTTP/1.0
-Connection: close
+Host: {host}
+Connection: Close
 Content-Type: application/x-www-form-urlencoded
 X-CouchDB-WWW-Authenticate: Cookie
 Content-Length: $content_length

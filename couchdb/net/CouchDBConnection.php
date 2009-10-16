@@ -101,6 +101,7 @@ class CouchDBConnection
 				break;
 		}
 		
+		$request = str_replace('{host}', $this->_host.':'.$this->_port, $request);
 		$request = str_replace('{authorization}', $authorization, $request);
 		$data    = $this->connect($request);
 		
@@ -117,6 +118,20 @@ class CouchDBConnection
 		{
 			$response = CouchDBResponse::responseWithData($data);
 		}
+		
+
+		/*
+		if($response->headers['status']['code'] == 401) // Unauthorized 
+		{
+			if(isset($response->headers['WWW-Authenticate']))
+			{
+				if (strpos($response->headers['WWW-Authenticate'], 'Basic') !== false)
+				{
+					// need a way to deal with this for n requests per state basic auth, save baiscally
+				}
+			}
+		} 
+		*/
 		
 		/*if($response->error)
 		{

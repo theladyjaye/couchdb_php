@@ -56,7 +56,8 @@ class DeleteDatabase implements CouchDBCommand
 	{
 		return <<<REQUEST
 DELETE /$this->value HTTP/1.0
-Connection: close
+Host: {host}
+Connection: Close
 {authorization}
 
 

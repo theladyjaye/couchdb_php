@@ -44,7 +44,8 @@ class SessionLogout implements CouchDBCommand
 	{
 		return <<<REQUEST
 DELETE /_session HTTP/1.0
-Connection: close
+Host: {host}
+Connection: Close
 Content-Type: application/x-www-form-urlencoded
 {authorization}
 

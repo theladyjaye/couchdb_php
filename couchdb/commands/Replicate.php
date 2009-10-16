@@ -64,8 +64,9 @@ class Replicate implements CouchDBCommand
 		
 		return <<<REQUEST
 POST /_replicate HTTP/1.0
-Content-Length: $content_length
+Host: {host}
 Connection: Close
+Content-Length: $content_length
 Content-Type: application/json
 {authorization}
 

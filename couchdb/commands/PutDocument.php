@@ -74,8 +74,9 @@ class PutDocument implements CouchDBCommand
 		
 		return <<<REQUEST
 PUT /$this->database/$this->id/$batch HTTP/1.0
-Content-Length: $content_length
+Host: {host}
 Connection: Close
+Content-Length: $content_length
 Content-Type: application/json
 {authorization}
 

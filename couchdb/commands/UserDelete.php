@@ -53,6 +53,8 @@ class UserDelete implements CouchDBCommand
 		
 		return <<<REQUEST
 DELETE /users/$this->id HTTP/1.0
+Host: {host}
+Connection: Close
 If-Match: "$this->revision"
 {authorization}
 

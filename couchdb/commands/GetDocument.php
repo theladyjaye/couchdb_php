@@ -59,7 +59,8 @@ class GetDocument implements CouchDBCommand
 	{
 		return <<<REQUEST
 GET /$this->database/$this->id HTTP/1.0
-Connection: close
+Host: {host}
+Connection: Close
 {authorization}
 
 

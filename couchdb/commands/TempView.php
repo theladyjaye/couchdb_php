@@ -92,6 +92,8 @@ class TempView implements CouchDBCommand
 		
 		return <<<REQUEST
 POST $location HTTP/1.0
+Host: {host}
+Connection: Close
 Content-Length: $content_length
 Content-Type: application/json
 {authorization}

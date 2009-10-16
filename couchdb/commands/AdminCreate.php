@@ -55,7 +55,8 @@ class AdminCreate implements CouchDBCommand
 		
 		return <<<REQUEST
 PUT /_config/admins/$this->username HTTP/1.0
-Connection: close
+Host: {host}
+Connection: Close
 Content-Length: $content_length
 Content-Type: application/json
 {authorization}

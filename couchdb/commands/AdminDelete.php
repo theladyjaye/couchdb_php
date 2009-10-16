@@ -50,7 +50,8 @@ class AdminDelete implements CouchDBCommand
 	{
 		return <<<REQUEST
 DELETE /_config/admins/$this->username HTTP/1.0
-Connection: close
+Host: {host}
+Connection: Close
 {authorization}
 
 
