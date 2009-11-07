@@ -186,7 +186,7 @@ class CouchDB
 		}
 		else if(is_object($document))
 		{
-			$json = $document->__toJSON();
+			$json = $document->__toString();
 		}
 		else if(is_string($document))
 		{
