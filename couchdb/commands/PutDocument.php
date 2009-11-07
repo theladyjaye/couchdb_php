@@ -56,7 +56,7 @@ class PutDocument implements CouchDBCommand
 	{
 		$this->database = $database;
 		$this->json     = $json;
-		$this->id       = urlencode($id);
+		$this->id       = $id;
 		$this->batch    = $batch;
 	}
 	
