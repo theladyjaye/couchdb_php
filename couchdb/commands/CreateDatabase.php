@@ -49,7 +49,7 @@ class CreateDatabase implements CouchDBCommand
 	 */
 	public function __construct($value)
 	{
-		$this->value = $value;
+		$this->value = urlencode($value);
 	}
 	
 	public function request()
