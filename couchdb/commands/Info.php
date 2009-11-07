@@ -48,7 +48,7 @@ class Info implements CouchDBCommand
 	 */
 	public function __construct($database)
 	{
-		$this->database = $database;
+		$this->database = urlencode($database);
 	}
 	
 	public function request()

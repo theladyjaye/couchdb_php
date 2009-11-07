@@ -93,6 +93,7 @@ class CouchDB
 	 */
 	public function __construct($options=null)
 	{
+		if(isset($options['database'])) $options['database'] = urlencode($options['database']);
 		$this->connectionOptions = $options;
 	}
 	
