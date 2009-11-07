@@ -34,6 +34,10 @@
  */
 class CouchDBView implements Countable, Iterator, ArrayAccess
 {
+	const kDocContext   = 'doc';
+	const kValueContext = 'value';
+	
+	public $context     = CouchDBView::kValueContext;
 	private $result;
 	private $position;
 	private $count;
@@ -116,7 +120,7 @@ class CouchDBView implements Countable, Iterator, ArrayAccess
 	 */
 	public function current() 
 	{
-		return $this->result['rows'][$this->position]['value'];
+		return $this->result['rows'][$this->position][$this->context];
 	}
 	
 	/**
@@ -150,7 +154,7 @@ class CouchDBView implements Countable, Iterator, ArrayAccess
 	 */
 	public function valid() 
 	{
-		return isset($this->result['rows'][$this->position]['value']);
+		return isset($this->result['rows'][$this->position][$this->context]);
 	}
 	
 	/* ArrayAccess */

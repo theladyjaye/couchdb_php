@@ -480,7 +480,13 @@ class CouchDB
 			}
 			else
 			{
-				return CouchDBView::viewWithJSON($response->data);
+				$view = CouchDBView::viewWithJSON($response->data);
+				
+				if(isset($options['include_docs']) && $options['include_docs']){
+					$view->context = CouchDBView::kDocContext;
+				}
+				
+				return $view
 			}
 		}
 		else
