@@ -705,7 +705,7 @@ class CouchDB
 			
 		$connection = new CouchDBConnection($this->connectionOptions);
 		$response   = $connection->execute(new CDBInfo($value));
-			
+		
 		if($json)
 		{
 			return $response->data;

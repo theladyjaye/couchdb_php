@@ -632,7 +632,6 @@ FUNCTION;
 	public function testViewGetDefault()
 	{
 		$result = $this->couchdb->view('records/default');
-		print_r($result);exit;
 		$records = count($result);
 		$this->assertEquals(2, $records);
 	}
@@ -762,16 +761,18 @@ FUNCTION;
 		$map = <<<FUNCTION
 		function(doc) 
 		{ 
-			if(doc.type == '$default' || doc.type == '$update')
+			if(doc.type == '$update')
 			{ 
 				emit(doc.email, doc);
 			}
 		}
 FUNCTION;
+		
 
 		$result = $this->couchdb->temp_view($map);
 		$records = count($result);
 		$this->assertEquals(1, $records);
+		$this->assertEquals($result[0]['value']['email'], CouchDBTestConstants::kEmailAddress);
 	}
 	
 	public function testTempViewWithReduce()
@@ -864,17 +865,15 @@ FUNCTION;
 	/* CLEANUP */
 	public function testDocumentDelete()
 	{
-		//$result = $this->couchdb->delete(CouchDBTest::$id);
-		//$this->assertType(PHPUnit_Framework_Constraint_IsType::TYPE_ARRAY, $result);
-		//$this->assertEquals($result['ok'], true);
+		$result = $this->couchdb->delete(CouchDBTest::$id);
+		$this->assertType(PHPUnit_Framework_Constraint_IsType::TYPE_ARRAY, $result);
+		$this->assertEquals($result['ok'], true);
 	}
 	
-	/**
-	 * @expectedException Exception
-	 */
 	public function testDocumentConfirmDelete()
 	{
 		$document = $this->couchdb->document(CouchDBTest::$id);
+		$this->assertEquals($document['error'], 'not_found');
 	}
 	
 	/**
@@ -895,14 +894,11 @@ FUNCTION;
 		$couchdb->info();
 	}
 	
-	/**
-	 * @expectedException Exception
-	 */
 	public function testDatabaseDeleteWithDefaultOptions()
 	{
-		//$this->couchdb->delete_database();
-		//$info = $this->couchdb->info(CouchDBTestConstants::kDatabaseName);
-		
+		$this->couchdb->delete_database();
+		$info = $this->couchdb->info(CouchDBTestConstants::kDatabaseName);
+		$this->assertEquals($info['error'], 'not_found');
 	}
 	
 
