@@ -37,7 +37,7 @@ require_once 'CouchDBCommand.php';
  * @package Commands
  * @author Adam Venturella
  */
-class PutAttachment implements CouchDBCommand 
+class CDBPutAttachment implements CouchDBCommand 
 {
 	private $database;
 	private $attachment;

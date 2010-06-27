@@ -37,7 +37,7 @@ require_once 'CouchDBCommand.php';
  * @package Commands
  * @author Adam Venturella
  */
-class CreateDatabase implements CouchDBCommand
+class CDBCreateDatabase implements CouchDBCommand
 {
 	private $value;
 	

@@ -37,7 +37,7 @@ require_once 'CouchDBCommand.php';
  * @package Commands
  * @author Adam Venturella
  */
-class Replicate implements CouchDBCommand 
+class CDBReplicate implements CouchDBCommand 
 {
 	private $source;
 	private $target;

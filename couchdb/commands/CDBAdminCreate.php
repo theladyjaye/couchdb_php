@@ -37,7 +37,7 @@ require_once 'CouchDBCommand.php';
  * @package Commands
  * @author Adam Venturella
  */
-class AdminCreate implements CouchDBCommand 
+class CDBAdminCreate implements CouchDBCommand 
 {
 	public $username;
 	public $password;

@@ -32,28 +32,8 @@
  **/
 require 'CouchDBFunctions.php';
 require 'CouchDBView.php';
-require 'commands/Info.php';
-require 'commands/TempView.php';
-require 'commands/View.php';
-require 'commands/Version.php';
-require 'commands/PutDocument.php';
-require 'commands/PutAttachment.php';
-require 'commands/DeleteAttachment.php';
-require 'commands/GetAttachment.php';
-require 'commands/GetDocument.php';
-require 'commands/GetDocumentMultiple.php';
-require 'commands/DeleteDocument.php';
-require 'commands/CreateDatabase.php';
-require 'commands/DeleteDatabase.php';
-require 'commands/Replicate.php';
-require 'commands/AdminCreate.php';
-require 'commands/AdminDelete.php';
-require 'commands/SessionLogin.php';
-require 'commands/SessionLogout.php';
-require 'commands/UserCreate.php';
-require 'commands/UserDelete.php';
-require 'commands/UserUpdate.php';
-require 'commands/Compact.php';
+require 'commands/CDBSessionLogin.php';
+require 'commands/CDBSessionLogout.php';
 require 'net/CouchDBConnection.php';
 require 'net/CouchDBResponse.php';
 
@@ -123,10 +103,19 @@ class CouchDB
 	 */
 	public function multi_documents($keys, $options=null, $json=false)
 	{
+		static $loaded = false;
+		
+		if(!$loaded)
+		{
+			require 'commands/CDBGetDocumentMultiple.php';
+			$loaded = true;
+		}
+			
+		
 		if($this->shouldPerformActionWithDatabase())
 		{
 			$connection = new CouchDBConnection($this->connectionOptions);
-			$response   = $connection->execute(new GetDocumentMultiple($this->connectionOptions['database'], $keys, $options));
+			$response   = $connection->execute(new CDBGetDocumentMultiple($this->connectionOptions['database'], $keys, $options));
 			
 			if($json)
 			{
@@ -154,10 +143,18 @@ class CouchDB
 	 */
 	public function document($id, $json=false)
 	{
+		static $loaded = false;
+		
+		if(!$loaded)
+		{
+			require 'commands/CDBGetDocument.php';
+			$loaded = true;
+		}
+		
 		if($this->shouldPerformActionWithDatabase())
 		{
 			$connection = new CouchDBConnection($this->connectionOptions);
-			$response   = $connection->execute(new GetDocument($this->connectionOptions['database'], $id));
+			$response   = $connection->execute(new CDBGetDocument($this->connectionOptions['database'], $id));
 			
 			if($json)
 			{
@@ -188,6 +185,14 @@ class CouchDB
 	 */
 	public function delete($id, $revision=null)
 	{
+		static $loaded = false;
+		
+		if(!$loaded)
+		{
+			require 'commands/CDBDeleteDocument.php';
+			$loaded = true;
+		}
+		
 		if($this->shouldPerformActionWithDatabase())
 		{
 			if(!$revision)
@@ -196,7 +201,7 @@ class CouchDB
 			}
 			
 			$connection = new CouchDBConnection($this->connectionOptions);
-			$response   = $connection->execute(new DeleteDocument($this->connectionOptions['database'], $id, $revision));
+			$response   = $connection->execute(new CDBDeleteDocument($this->connectionOptions['database'], $id, $revision));
 			return $response->result;
 		}
 		else
@@ -225,6 +230,14 @@ class CouchDB
 	 */
 	public function put($document, $id=null, $batch=false)
 	{
+		static $loaded = false;
+		
+		if(!$loaded)
+		{
+			require 'commands/CDBPutDocument.php';
+			$loaded = true;
+		}
+		
 		$json = null;
 		
 		if(is_array($document) || is_a($document, 'stdClass'))
@@ -243,7 +256,7 @@ class CouchDB
 		if($this->shouldPerformActionWithDatabase())
 		{
 			$connection = new CouchDBConnection($this->connectionOptions);
-			$response   = $connection->execute(new PutDocument($this->connectionOptions['database'], $json, $id, $batch));
+			$response   = $connection->execute(new CDBPutDocument($this->connectionOptions['database'], $json, $id, $batch));
 			return $response->result;
 		}
 		else
@@ -265,11 +278,18 @@ class CouchDB
 	 */
 	public function attachment($document, $name)
 	{
-
+		static $loaded = false;
+		
+		if(!$loaded)
+		{
+			require 'commands/CDBGetAttachment.php';
+			$loaded = true;
+		}
+		
 		if($this->shouldPerformActionWithDatabase())
 		{
 			$connection = new CouchDBConnection($this->connectionOptions);
-			$response   = $connection->execute(new GetAttachment($this->connectionOptions['database'], $document, $name));
+			$response   = $connection->execute(new CDBGetAttachment($this->connectionOptions['database'], $document, $name));
 			return $response->result;
 		}
 		else
@@ -292,6 +312,14 @@ class CouchDB
 	 */
 	public function delete_attachment($document, $name, $revision=null)
 	{
+		static $loaded = false;
+		
+		if(!$loaded)
+		{
+			require 'commands/CDBDeleteAttachment.php';
+			$loaded = true;
+		}
+		
 		if($this->shouldPerformActionWithDatabase())
 		{
 			if(!$revision)
@@ -300,7 +328,7 @@ class CouchDB
 			}
 
 			$connection = new CouchDBConnection($this->connectionOptions);
-			$response   = $connection->execute(new DeleteAttachment($this->connectionOptions['database'], $document, $name, $revision));
+			$response   = $connection->execute(new CDBDeleteAttachment($this->connectionOptions['database'], $document, $name, $revision));
 			return $response->result;
 		}
 		else
@@ -334,6 +362,14 @@ class CouchDB
 	 */
 	public function put_attachment($attachment, $document=null, $revision=null)
 	{
+		static $loaded = false;
+		
+		if(!$loaded)
+		{
+			require 'commands/CDBPutAttachment.php';
+			$loaded = true;
+		}
+		
 		if($this->shouldPerformActionWithDatabase())
 		{
 			if(!$revision)
@@ -342,7 +378,7 @@ class CouchDB
 			}
 
 			$connection = new CouchDBConnection($this->connectionOptions);
-			$response   = $connection->execute(new PutAttachment($this->connectionOptions['database'], $attachment, $document, $revision));
+			$response   = $connection->execute(new CDBPutAttachment($this->connectionOptions['database'], $attachment, $document, $revision));
 			return $response->result;
 		}
 		else
@@ -387,10 +423,18 @@ class CouchDB
 	 */
 	public function temp_view($map, $reduce=null, $options=null, $json=false)
 	{
+		static $loaded = false;
+		
+		if(!$loaded)
+		{
+			require 'commands/CDBTempView.php';
+			$loaded = true;
+		}
+		
 		if($this->shouldPerformActionWithDatabase())
 		{
 			$connection = new CouchDBConnection($this->connectionOptions);
-			$response   = $connection->execute(new TempView($this->connectionOptions['database'], $map, $reduce, $options));
+			$response   = $connection->execute(new CDBTempView($this->connectionOptions['database'], $map, $reduce, $options));
 			
 			if($json)
 			{
@@ -515,10 +559,18 @@ class CouchDB
 	 */
 	public function view($target, $options=null, $json=false)
 	{
+		static $loaded = false;
+		
+		if(!$loaded)
+		{
+			require 'commands/CDBView.php';
+			$loaded = true;
+		}
+		
 		if($this->shouldPerformActionWithDatabase())
 		{
 			$connection = new CouchDBConnection($this->connectionOptions);
-			$response   = $connection->execute(new View($this->connectionOptions['database'], $target, $options));
+			$response   = $connection->execute(new CDBView($this->connectionOptions['database'], $target, $options));
 			
 			if($json)
 			{
@@ -554,6 +606,14 @@ class CouchDB
 	 */
 	public function create_database($value=null)
 	{
+		static $loaded = false;
+		
+		if(!$loaded)
+		{
+			require 'commands/CDBCreateDatabase.php';
+			$loaded = true;
+		}
+		
 		if(!$value)
 		{
 			if($this->shouldPerformActionWithDatabase())
@@ -567,7 +627,7 @@ class CouchDB
 		}
 		
 		$connection = new CouchDBConnection($this->connectionOptions);
-		$connection->execute(new CreateDatabase($value));
+		$connection->execute(new CDBCreateDatabase($value));
 	}
 	
 	/**
@@ -583,6 +643,14 @@ class CouchDB
 	 */
 	public function delete_database($value=null)
 	{
+		static $loaded = false;
+		
+		if(!$loaded)
+		{
+			require 'commands/CDBDeleteDatabase.php';
+			$loaded = true;
+		}
+		
 		if(!$value)
 		{
 			if($this->shouldPerformActionWithDatabase())
@@ -596,7 +664,7 @@ class CouchDB
 		}
 		
 		$connection = new CouchDBConnection($this->connectionOptions);
-		$connection->execute(new DeleteDatabase($value));
+		$connection->execute(new CDBDeleteDatabase($value));
 	}
 	
 	/**
@@ -615,6 +683,14 @@ class CouchDB
 	 */
 	public function info($value=null, $json=false)
 	{
+		static $loaded = false;
+		
+		if(!$loaded)
+		{
+			require 'commands/CDBInfo.php';
+			$loaded = true;
+		}
+		
 		if($this->shouldPerformActionWithDatabase())
 		{
 			if(!$value)
@@ -628,7 +704,7 @@ class CouchDB
 		}
 			
 		$connection = new CouchDBConnection($this->connectionOptions);
-		$response   = $connection->execute(new Info($value));
+		$response   = $connection->execute(new CDBInfo($value));
 			
 		if($json)
 		{
@@ -651,6 +727,14 @@ class CouchDB
 	
 	public function compact($database=null)
 	{
+		static $loaded = false;
+		
+		if(!$loaded)
+		{
+			require 'commands/CDBCompact.php';
+			$loaded = true;
+		}
+		
 		if(!$database)
 		{
 			$database = $this->connectionOptions['database'];
@@ -661,7 +745,7 @@ class CouchDB
 		}
 		
 		$connection = new CouchDBConnection($this->connectionOptions);
-		$response   = $connection->execute(new Compact($database));
+		$response   = $connection->execute(new CDBCompact($database));
 		return $response;
 	}
 	
@@ -684,8 +768,16 @@ class CouchDB
 	 */
 	public function replicate($source, $target)
 	{
+		static $loaded = false;
+		
+		if(!$loaded)
+		{
+			require 'commands/CDBReplicate.php';
+			$loaded = true;
+		}
+		
 		$connection = new CouchDBConnection($this->connectionOptions);
-		$response   = $connection->execute(new Replicate($source, $target));
+		$response   = $connection->execute(new CDBReplicate($source, $target));
 	    return $response;
 	}
 	
@@ -700,8 +792,16 @@ class CouchDB
 	 */
 	public function admin_create($username, $password)
 	{
+		static $loaded = false;
+		
+		if(!$loaded)
+		{
+			require 'commands/CDBAdminCreate.php';
+			$loaded = true;
+		}
+		
 		$connection = new CouchDBConnection($this->connectionOptions);
-		$response   = $connection->execute(new AdminCreate($username, $password));
+		$response   = $connection->execute(new CDBAdminCreate($username, $password));
 		return $response;
 	}
 	
@@ -715,8 +815,16 @@ class CouchDB
 	 */
 	public function admin_delete($username)
 	{
+		static $loaded = false;
+		
+		if(!$loaded)
+		{
+			require 'commands/CDBAdminDelete.php';
+			$loaded = true;
+		}
+		
 		$connection = new CouchDBConnection($this->connectionOptions);
-		$response   = $connection->execute(new AdminDelete($username));
+		$response   = $connection->execute(new CDBAdminDelete($username));
 		return $response;
 	}
 	
@@ -733,8 +841,16 @@ class CouchDB
 	 */
 	public function user_create($username, $password, $email, $roles)
 	{
+		static $loaded = false;
+		
+		if(!$loaded)
+		{
+			require 'commands/CDBUserCreate.php';
+			$loaded = true;
+		}
+		
 		$connection = new CouchDBConnection($this->connectionOptions);
-		$response   = $connection->execute(new UserCreate($username, $password, $email, $roles, $extras));
+		$response   = $connection->execute(new CDBUserCreate($username, $password, $email, $roles, $extras));
 		return $response;
 	}
 	
@@ -748,10 +864,18 @@ class CouchDB
 	 */
 	public function user_delete($username)
 	{
+		static $loaded = false;
+		
+		if(!$loaded)
+		{
+			require 'commands/CDBUserDelete.php';
+			$loaded = true;
+		}
+		
 		$user = $this->user($username);
 		
 		$connection = new CouchDBConnection($this->connectionOptions);
-		$response   = $connection->execute(new UserDelete($user['_id'], $user['_rev']));
+		$response   = $connection->execute(new CDBUserDelete($user['_id'], $user['_rev']));
 		return $response;
 	}
 	
@@ -769,8 +893,16 @@ class CouchDB
 	 */
 	public function user_update($username, $password=null, $old_password=null, $email=null, $roles=null)
 	{
+		static $loaded = false;
+		
+		if(!$loaded)
+		{
+			require 'commands/CDBUserUpdate.php';
+			$loaded = true;
+		}
+		
 		$connection = new CouchDBConnection($this->connectionOptions);
-		$response   = $connection->execute(new UserUpdate($username, $password, $old_password, $email, $roles));
+		$response   = $connection->execute(new CDBUserUpdate($username, $password, $old_password, $email, $roles));
 		return $response;
 	}
 	
@@ -807,8 +939,16 @@ class CouchDB
 	 */
 	public function acl()
 	{
+		static $loaded = false;
+		
+		if(!$loaded)
+		{
+			require_once 'commands/CDBGetDocument.php';
+			$loaded = true;
+		}
+		
 		$connection = new CouchDBConnection($this->connectionOptions);
-		$response   = $connection->execute(new GetDocument('users', '_local/_acl'));
+		$response   = $connection->execute(new CDBGetDocument('users', '_local/_acl'));
 		return $response;
 	}
 	/**
@@ -822,6 +962,14 @@ class CouchDB
 	 */
 	public function acl_create_rules($collection)
 	{
+		static $loaded = false;
+		
+		if(!$loaded)
+		{
+			require_once 'commands/CDBPutDocument.php';
+			$loaded = true;
+		}
+		
 		$rules    = array();
 		$response = null;
 		
@@ -870,7 +1018,7 @@ class CouchDB
 		}
 		
 		$connection = new CouchDBConnection($this->connectionOptions);
-		$response   = $connection->execute(new PutDocument('users', $json, $id, $batch));
+		$response   = $connection->execute(new CDBPutDocument('users', $json, $id, $batch));
 		
 		return $response;
 	}
@@ -886,6 +1034,14 @@ class CouchDB
 	 */
 	public function acl_delete_rules($collection)
 	{
+		static $loaded = false;
+		
+		if(!$loaded)
+		{
+			require_once 'commands/CDBPutDocument.php';
+			$loaded = true;
+		}
+		
 		static $matchDB    = 2;
 		static $matchRole  = 4;
 		static $matchAllow = 8;
@@ -932,7 +1088,7 @@ class CouchDB
 			$id                = '_local/_acl';
 			$batch             = false;
 			$connection        = new CouchDBConnection($this->connectionOptions);
-			$response          = $connection->execute(new PutDocument('users', $json, $id, $batch));
+			$response          = $connection->execute(new CDBPutDocument('users', $json, $id, $batch));
 			
 			return $response;
 		}
@@ -979,11 +1135,19 @@ class CouchDB
 	 */
 	public function session_login($username, $password, $setcookie=false)
 	{
+		static $loaded = false;
+		
+		if(!$loaded)
+		{
+			require 'commands/CDBSessionLogout.php';
+			$loaded = true;
+		}
+		
 		$session       = null;
 		$connection    = new CouchDBConnection($this->connectionOptions);
 		try
 		{
-			$response      = $connection->execute(new SessionLogin($username, $password));
+			$response      = $connection->execute(new CDBSessionLogin($username, $password));
 		}
 		catch(Exception $e){}
 		
@@ -1018,9 +1182,17 @@ class CouchDB
 	 */
 	public function session_logout($setcookie=false)
 	{
+		static $loaded = false;
+		
+		if(!$loaded)
+		{
+			require 'commands/CDBSessionLogout.php';
+			$loaded = true;
+		}
+		
 		$session    = null;
 		$connection = new CouchDBConnection($this->connectionOptions);
-		$response   = $connection->execute(new SessionLogout());
+		$response   = $connection->execute(new CDBSessionLogout());
 		
 		if($response->headers['status']['code'] == 200)
 		{
@@ -1071,10 +1243,18 @@ class CouchDB
 	 */
 	private function _revisionForDocument($document)
 	{
+		static $loaded = false;
+		
+		if(!$loaded)
+		{
+			require_once 'commands/CDBGetDocument.php';
+			$loaded = true;
+		}
+		
 		if($this->shouldPerformActionWithDatabase())
 		{
 			$connection = new CouchDBConnection($this->connectionOptions);
-			$response   = $connection->execute(new GetDocument($this->connectionOptions['database'], $document));
+			$response   = $connection->execute(new CDBGetDocument($this->connectionOptions['database'], $document));
 			return $response->result['_rev'];
 		}
 		else
@@ -1092,8 +1272,16 @@ class CouchDB
 	 **/
 	private function _version()
 	{
+		static $loaded = false;
+		
+		if(!$loaded)
+		{
+			require_once 'commands/CDBVersion.php';
+			$loaded = true;
+		}
+		
 		$connection = new CouchDBConnection($this->connectionOptions);
-		$response   = $connection->execute(new Version());
+		$response   = $connection->execute(new CDBVersion());
 		
 		return $response->result['version'];
 	}

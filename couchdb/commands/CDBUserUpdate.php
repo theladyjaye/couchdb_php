@@ -37,7 +37,7 @@ require_once 'CouchDBCommand.php';
  * @package Commands
  * @author Adam Venturella
  */
-class UserUpdate implements CouchDBCommand 
+class CDBUserUpdate implements CouchDBCommand 
 {
 	public $username;
 	public $password;

@@ -37,7 +37,7 @@ require_once 'CouchDBCommand.php';
  * @package Commands
  * @author Adam Venturella
  */
-class SessionLogout implements CouchDBCommand
+class CDBSessionLogout implements CouchDBCommand
 {
 	
 	public function request()

@@ -37,7 +37,7 @@ require_once 'CouchDBCommand.php';
  * @package Commands
  * @author Adam Venturella
  */
-class GetAttachment implements CouchDBCommand 
+class CDBGetAttachment implements CouchDBCommand 
 {
 	private $database;
 	private $name;

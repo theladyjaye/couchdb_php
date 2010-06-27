@@ -37,7 +37,7 @@ require_once 'CouchDBCommand.php';
  * @package Commands
  * @author Adam Venturella
  */
-class TempView implements CouchDBCommand 
+class CDBTempView implements CouchDBCommand 
 {
 	private $database;
 	private $map;

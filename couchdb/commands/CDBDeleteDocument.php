@@ -37,7 +37,7 @@ require_once 'CouchDBCommand.php';
  * @package Commands
  * @author Adam Venturella
  */
-class DeleteDocument implements CouchDBCommand 
+class CDBDeleteDocument implements CouchDBCommand 
 {
 	private $database;
 	private $id;

@@ -29,7 +29,7 @@ require_once 'PHPUnit/Framework.php';
 require_once 'couchdb/CouchDB.php';
 require_once 'CouchDBTestConstants.php';
 
-class UserTests extends PHPUnit_Framework_TestCase
+class CouchDBUserTests extends PHPUnit_Framework_TestCase
 {
 	private $couchdb;
 	private $couchdbLogin;

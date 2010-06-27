@@ -37,7 +37,7 @@ require_once 'CouchDBCommand.php';
  * @package Commands
  * @author Adam Venturella
  */
-class GetDocument implements CouchDBCommand 
+class CDBGetDocument implements CouchDBCommand 
 {
 	private $database;
 	private $id;

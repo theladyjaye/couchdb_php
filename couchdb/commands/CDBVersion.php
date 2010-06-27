@@ -37,7 +37,7 @@ require_once 'CouchDBCommand.php';
  * @package Commands
  * @author Adam Venturella
  */
-class Version implements CouchDBCommand 
+class CDBVersion implements CouchDBCommand 
 {
 	public function request()
 	{

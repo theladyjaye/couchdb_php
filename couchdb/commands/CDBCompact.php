@@ -37,7 +37,7 @@ require_once 'CouchDBCommand.php';
  * @package Commands
  * @author Adam Venturella
  */
-class Compact implements CouchDBCommand 
+class CDBCompact implements CouchDBCommand 
 {
 	private $database;
 	

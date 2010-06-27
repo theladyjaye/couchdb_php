@@ -37,7 +37,7 @@ require_once 'CouchDBCommand.php';
  * @package Commands
  * @author Adam Venturella
  */
-class PutDocument implements CouchDBCommand 
+class CDBPutDocument implements CouchDBCommand 
 {
 	private $database;
 	private $id;
