@@ -110,7 +110,7 @@ class CouchDBConnection
 		// interface $command->rawResponse() returns bool or something like that.
 		// dunno if I am comfortable NEEDING that class here.  On the other hand it seems silly
 		// to require all of the commands to need that function.  Abstract CouchDBCommand?
-		if(is_a($command, 'GetAttachment'))
+		if(is_a($command, 'CDBGetAttachment'))
 		{
 			$response = CouchDBResponse::responseWithAttachment($data);
 		}

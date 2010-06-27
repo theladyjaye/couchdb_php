@@ -60,7 +60,7 @@ class CDBGetAttachment implements CouchDBCommand
 	
 	public function request()
 	{
-		 return <<<REQUEST
+		return <<<REQUEST
 GET /$this->database/$this->document/$this->name HTTP/1.0
 Host: {host}
 Connection: Close
