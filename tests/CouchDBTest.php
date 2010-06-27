@@ -632,6 +632,7 @@ FUNCTION;
 	public function testViewGetDefault()
 	{
 		$result = $this->couchdb->view('records/default');
+		print_r($result);exit;
 		$records = count($result);
 		$this->assertEquals(2, $records);
 	}
