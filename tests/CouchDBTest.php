@@ -36,9 +36,12 @@
  *    @license http://www.apache.org/licenses/LICENSE-2.0 Apache 2.0
  *
  **/
+date_default_timezone_set('America/Los_Angeles');
 require_once 'PHPUnit/Framework.php';
 require_once 'couchdb/CouchDB.php';
 require_once 'CouchDBTestConstants.php';
+
+
 	
 class CouchDBTest extends PHPUnit_Framework_TestCase
 {
@@ -95,9 +98,9 @@ class CouchDBTest extends PHPUnit_Framework_TestCase
 	 */
 	protected function setUp()
 	{
-		$optionsAuth         = array('database'=>CouchDBTestConstants::kDatabaseName, 'authorization'=>'basic', 'username'=>CouchDBTestConstants::kAdminPrimaryUsername, 'password'=>CouchDBTestConstants::kAdminPrimaryPassword);
+		$optionsAuth         = null;//array('database'=>CouchDBTestConstants::kDatabaseName, 'authorization'=>'basic', 'username'=>CouchDBTestConstants::kAdminPrimaryUsername, 'password'=>CouchDBTestConstants::kAdminPrimaryPassword);
 		$optionsNoAuth       = array('database'=>CouchDBTestConstants::kDatabaseName);
-		$this->couchdb       = new CouchDB($optionsAuth);
+		$this->couchdb       = new CouchDB($optionsNoAuth);
 		$this->couchdbNoAuth = new CouchDB($optionsNoAuth);
 	}
 	
@@ -856,103 +859,6 @@ FUNCTION;
 		$couchdb = new CouchDB();
 		$couchdb->compact();
 	}
-	
-	/* REPLICATION */
-	
-	public function testReplication()
-	{
-		$this->couchdb->create_database(CouchDBTestConstants::kAltDatabaseName);
-		$this->couchdb->replicate(CouchDBTestConstants::kDatabaseName, CouchDBTestConstants::kAltDatabaseName);
-		
-		$info1 = $this->couchdb->info(CouchDBTestConstants::kDatabaseName);
-		$info2 = $this->couchdb->info(CouchDBTestConstants::kAltDatabaseName);
-		
-		$this->assertEquals($info1['doc_count'], $info2['doc_count']);
-	}
-	
-	public function testReplicationViewDefault()
-	{
-		$replicated = new CouchDB( array('database' => CouchDBTestConstants::kAltDatabaseName) );
-		$result = $replicated->view('records/default');
-		$count  = count($result);
-		$this->assertEquals(2, $count);
-		
-		foreach($result as $document)
-		{
-			$this->assertNotNull($document);
-			$this->assertArrayHasKey('_id', $document);
-			$this->assertArrayHasKey('_rev', $document);
-			$this->assertArrayHasKey('label', $document);
-			$this->assertArrayHasKey('type', $document);
-			$this->assertArrayHasKey('creationDate', $document);
-			
-			$this->assertNotNull($document['_id']);
-			$this->assertNotNull($document['_rev']);
-			$this->assertNotNull($document['label']);
-			$this->assertNotNull($document['type']);
-			$this->assertNotNull($document['creationDate']);
-		}
-		
-		$this->assertTrue(isset($result[0]));
-	}
-	
-	public function testReplicationViewUpdate()
-	{
-		$replicated = new CouchDB( array('database' => CouchDBTestConstants::kAltDatabaseName) );
-		$result = $replicated->view('records/update');
-		$records = count($result);
-		$this->assertEquals(1, $records);
-	}
-	
-	public function testReplicationViewDefaultCount()
-	{
-		$replicated = new CouchDB( array('database' => CouchDBTestConstants::kAltDatabaseName) );
-		$result     = $replicated->view('records/default_count');
-		$this->assertEquals(2, $result[0]['value']);
-	}
-	
-	public function testReplicationAttachment1()
-	{
-		$replicated      = new CouchDB( array('database' => CouchDBTestConstants::kAltDatabaseName) );
-		$original_path   = $this->pathForResource(CouchDBTestConstants::kAttachmentFilename1);
-		$attachment      = $replicated->attachment(CouchDBTest::$id, CouchDBTestConstants::kAttachmentName1);
-		$data1           = hash('md5', $attachment);
-		$data2           = hash('md5', file_get_contents($original_path));
-		
-		$this->assertEquals($data1, $data2);
-	}
-	
-	public function testReplicationAttachmentPDF()
-	{
-		$replicated      = new CouchDB( array('database' => CouchDBTestConstants::kAltDatabaseName) );
-		
-		$original_path   = $this->pathForResource(CouchDBTestConstants::kAttachmentFilenamePDF);
-		$attachment      = $replicated->attachment(CouchDBTest::$id_pdf, CouchDBTestConstants::kAttachmentNamePDF);
-		$data1           = hash('md5', $attachment);
-		$data2           = hash('md5', file_get_contents($original_path));
-		
-		$this->assertEquals($data1, $data2);
-	}
-	
-	/**
-	 * @expectedException Exception
-	 */
-	public function testReplicationAttachment2NotReplicated()
-	{
-		$replicated      = new CouchDB( array('database' => CouchDBTestConstants::kAltDatabaseName) );
-		$original_path   = $this->pathForResource(CouchDBTestConstants::kAttachmentFilename2);
-		$attachment      = $replicated->attachment(CouchDBTest::$id, CouchDBTestConstants::kAttachmentName2);
-	}
-	
-	/**
-	 * @expectedException Exception
-	 */
-	public function testReplicationDeleteWithValue()
-	{
-		$this->couchdb->delete_database(CouchDBTestConstants::kAltDatabaseName);
-		$info = $this->couchdb->info(CouchDBTestConstants::kAltDatabaseName);
-	}
-	
 	
 	/* CLEANUP */
 	public function testDocumentDelete()

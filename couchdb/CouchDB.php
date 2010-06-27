@@ -41,6 +41,7 @@ require 'commands/PutAttachment.php';
 require 'commands/DeleteAttachment.php';
 require 'commands/GetAttachment.php';
 require 'commands/GetDocument.php';
+require 'commands/GetDocumentMultiple.php';
 require 'commands/DeleteDocument.php';
 require 'commands/CreateDatabase.php';
 require 'commands/DeleteDatabase.php';
@@ -95,6 +96,51 @@ class CouchDB
 	{
 		if(isset($options['database'])) $options['database'] = urlencode($options['database']);
 		$this->connectionOptions = $options;
+	}
+	
+	/**
+	 * Get a multiple documents with an array of keys.
+	 * See: {@link http://wiki.apache.org/couchdb/HTTP_Bulk_Document_API CouchDB Bulk Document API}
+	 *
+	 * @param array $keys the keys of the documents to fetch
+	 * @param array $options optional array of querying options.
+	 *              startkey=aValue
+	 *              startkey_docid=aDocid
+	 *              endkey=aValue
+	 *              endkey_docid=aDocid
+	 *              limit=max rows to return
+	 *              stale=ok
+	 *              descending=true
+	 *              skip=number of rows to skip
+	 *              group=true
+	 *              group_level=int
+	 *              reduce=false
+	 *              include_docs=true
+	 *              Values must valid JSON for key, startkey, endkey
+	 * @param bool $json default is false, weather or not to return the result as JSON
+	 * @return void
+	 * @author Adam Venturella
+	 */
+	public function multi_documents($keys, $options=null, $json=false)
+	{
+		if($this->shouldPerformActionWithDatabase())
+		{
+			$connection = new CouchDBConnection($this->connectionOptions);
+			$response   = $connection->execute(new GetDocumentMultiple($this->connectionOptions['database'], $keys, $options));
+			
+			if($json)
+			{
+				return $response->data;
+			}
+			else
+			{
+				return $response->result;
+			}
+		}
+		else
+		{
+			$this->throw_no_database_exception();
+		}
 	}
 	
 	/**
@@ -486,7 +532,7 @@ class CouchDB
 					$view->context = CouchDBView::kDocContext;
 				}
 				
-				return $view
+				return $view;
 			}
 		}
 		else
