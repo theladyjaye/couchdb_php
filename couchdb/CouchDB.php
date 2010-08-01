@@ -153,6 +153,8 @@ class CouchDB
 		
 		if($this->shouldPerformActionWithDatabase())
 		{
+			$id = urlencode($id);
+			
 			$connection = new CouchDBConnection($this->connectionOptions);
 			$response   = $connection->execute(new CDBGetDocument($this->connectionOptions['database'], $id));
 			
@@ -255,9 +257,79 @@ class CouchDB
 		
 		if($this->shouldPerformActionWithDatabase())
 		{
+			$id = $id ? urlencode($id) : null;
 			$connection = new CouchDBConnection($this->connectionOptions);
 			$response   = $connection->execute(new CDBPutDocument($this->connectionOptions['database'], $json, $id, $batch));
 			return $response->result;
+		}
+		else
+		{
+			$this->throw_no_database_exception();
+		}
+	}
+	
+	public function copy($from_id, $to_id, $rev=null)
+	{
+		static $loaded = false;
+		
+		if(!$loaded)
+		{
+			require 'commands/CDBCopyDocument.php';
+			$loaded = true;
+		}
+		
+		
+		if($this->shouldPerformActionWithDatabase())
+		{
+			$from_id    = urlencode($from_id);
+			$connection = new CouchDBConnection($this->connectionOptions);
+			$response   = $connection->execute(new CDBCopyDocument($this->connectionOptions['database'], $from_id, $to_id, $rev));
+			return $response->result;
+		}
+		else
+		{
+			$this->throw_no_database_exception();
+		}
+	}
+	
+	public function bulk_update($documents, $json=false)
+	{
+		static $loaded = false;
+		
+		if(!$loaded)
+		{
+			require 'commands/CDBBulkUpdate.php';
+			$loaded = true;
+		}
+		
+		if($this->shouldPerformActionWithDatabase())
+		{
+			$json = null;
+
+			if(is_array($documents) || is_a($documents, 'stdClass'))
+			{
+				$json = couchdb_json_encode($documents);
+			}
+			else if(is_object($documents))
+			{
+				$json = $documents->__toString();
+			}
+			else if(is_string($documents))
+			{
+				$json = $documents;
+			}
+			
+			$connection = new CouchDBConnection($this->connectionOptions);
+			$response   = $connection->execute(new CDBBulkUpdate($this->connectionOptions['database'], $json));
+			
+			if($json)
+			{
+				return $response->data;
+			}
+			else
+			{
+				return $response->result;
+			}
 		}
 		else
 		{
@@ -289,7 +361,7 @@ class CouchDB
 		if($this->shouldPerformActionWithDatabase())
 		{
 			$connection = new CouchDBConnection($this->connectionOptions);
-			$response   = $connection->execute(new CDBGetAttachment($this->connectionOptions['database'], $document, $name));
+			$response   = $connection->execute(new CDBGetAttachment($this->connectionOptions['database'], urlencode($document), $name));
 			return $response->result;
 		}
 		else
@@ -328,7 +400,7 @@ class CouchDB
 			}
 
 			$connection = new CouchDBConnection($this->connectionOptions);
-			$response   = $connection->execute(new CDBDeleteAttachment($this->connectionOptions['database'], $document, $name, $revision));
+			$response   = $connection->execute(new CDBDeleteAttachment($this->connectionOptions['database'], urlencode($document), $name, $revision));
 			return $response->result;
 		}
 		else
@@ -378,7 +450,7 @@ class CouchDB
 			}
 
 			$connection = new CouchDBConnection($this->connectionOptions);
-			$response   = $connection->execute(new CDBPutAttachment($this->connectionOptions['database'], $attachment, $document, $revision));
+			$response   = $connection->execute(new CDBPutAttachment($this->connectionOptions['database'], $attachment, urlencode($document), $revision));
 			return $response->result;
 		}
 		else
@@ -520,16 +592,47 @@ class CouchDB
 	
 	}
 	
-	public function list()
-	{
-		
-	}
-	
 	public function show()
 	{
 		
 	}
 	*/
+	
+	public function formatList($list, $view, $options=null, $json=false)
+	{
+		static $loaded = false;
+		
+		if(!$loaded)
+		{
+			require 'commands/CDBList.php';
+			$loaded = true;
+		}
+		
+		if($this->shouldPerformActionWithDatabase())
+		{
+			$connection = new CouchDBConnection($this->connectionOptions);
+			$response   = $connection->execute(new CDBList($this->connectionOptions['database'], $list, $view, $options));
+			
+			if($json)
+			{
+				return $response->data;
+			}
+			else
+			{
+				/*$view = CouchDBView::viewWithJSON($response->data);
+				
+				if(isset($options['include_docs']) && $options['include_docs']){
+					$view->context = CouchDBView::kDocContext;
+				}
+				
+				return $view;*/
+			}
+		}
+		else
+		{
+			$this->throw_no_database_exception();
+		}
+	}
 	
 	/**
 	 * Get a View
